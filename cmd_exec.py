@@ -1,4 +1,4 @@
-from audio_manager import AudioManager
+from model.audio_manager import AudioManager
 import time
 
 audio = AudioManager()

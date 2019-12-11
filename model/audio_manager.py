@@ -59,8 +59,11 @@ class AudioManager:
         """
         self.audio.terminate()
 
-    def dump_recording(self):
-        wave_file = wave.open("test.wav", 'wb')
+    def dump_recording(self) -> None:
+        """
+        Dumps a recording to the root of the project.
+        """
+        wave_file = wave.open("../test.wav", 'wb')
         wave_file.setnchannels(CHANNELS)
         wave_file.setsampwidth(self.audio.get_sample_size(FORMAT))
         wave_file.setframerate(RATE)
