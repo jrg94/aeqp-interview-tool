@@ -21,3 +21,7 @@ Installing collected packages: pyaudio
 
     ----------------------------------------
 ```
+
+Turns out the issue is even deeper than this. I guess you can't actually
+run pyaudio in Python 3.7 or above. I'll have to figure out a workaround.
+See this discussion for more details: https://stackoverflow.com/questions/51992375/python-package-installation-issues-pyaudio-portaudio/52191687
