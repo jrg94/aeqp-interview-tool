@@ -12,7 +12,7 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.start_button.pack()
 
-        self.stop_button = tk.Button(self, text="Stop", command=self.stop_button, state=tk.DISABLED)
+        self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.stop_button.pack()
 
         # Pack window
@@ -35,7 +35,7 @@ class MainView(tk.Frame):
         self.controller = controller
 
     def start_action(self):
-        self.controller.processStartEvent()
+        self.controller.process_start_event()
 
     def stop_action(self):
-        self.controller.proccessStopEvent()
+        self.controller.process_stop_event()
