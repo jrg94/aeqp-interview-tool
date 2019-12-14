@@ -9,6 +9,9 @@ RECORD_SECONDS = 5
 
 
 class AudioManager:
+    """
+    An audio manager class which allows us to record from a PC mic.
+    """
 
     def __init__(self):
         self.audio = pyaudio.PyAudio()
