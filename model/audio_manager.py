@@ -1,4 +1,4 @@
-import pyaudio  # Needed Visual C++ 14.0 for this
+import pyaudio
 import wave
 
 FORMAT = pyaudio.paInt16
@@ -22,8 +22,8 @@ class AudioManager:
 
         :param in_data: latest data in the buffer
         :param frame_count: the number of frames included in data
-        :param time_info:
-        :param status:
+        :param time_info: time data
+        :param status: streaming status
         :return: the input data and the continue signal as a tuple
         """
         self.data.append(in_data)

@@ -19,7 +19,14 @@ class MainView(tk.Frame):
         self.pack()
 
     @staticmethod
-    def _update_button_enabled(button: tk.Button, state: bool):
+    def _update_button_enabled(button: tk.Button, state: bool) -> None:
+        """
+        Updates the enabled state of a button based on inputs.
+
+        :param button: the input button
+        :param state: the new state of the button (True for enabled)
+        :return: nothing
+        """
         if state:
             button.config(state=tk.NORMAL)
         else:
