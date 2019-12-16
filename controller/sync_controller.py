@@ -21,6 +21,7 @@ class SyncController:
         self.model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
+        self.view.animate_plots()
 
     def process_stop_event(self) -> None:
         """
@@ -32,3 +33,9 @@ class SyncController:
         self.model.dump_recording()
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
+
+    def process_audio_animation(self, i):
+        print("Executing animation")
+        self.view.audio_plot.clear()
+        self.view.audio_plot.plot(b''.join(self.model.data))
+        print(self.model.data)

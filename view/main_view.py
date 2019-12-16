@@ -2,6 +2,7 @@ import tkinter as tk
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import matplotlib.animation as animation
 
 
 class MainView(tk.Frame):
@@ -15,20 +16,20 @@ class MainView(tk.Frame):
 
         # Initialize fields
         self.controller = None
+        self.ani = None
 
         # Insert widgets
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
-        self.plots.add_subplot(111).plot((1, 2, 3), (1, 2, 3))
-        canvas = FigureCanvasTkAgg(self.plots, master=self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
+        self.audio_plot = self.plots.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(self.plots, master=self)
 
         # Arrange elements
         self.start_button.grid(row=1, column=0, sticky="nsew")
         self.stop_button.grid(row=1, column=1, sticky="nsew")
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -91,3 +92,12 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.controller.process_stop_event()
+
+    def animate_plots(self) -> None:
+        """
+        Sets up the animation after we get our controller reference.
+
+        :return: nothing
+        """
+        print("Launching animation")
+        self.ani = animation.FuncAnimation(self.plots, self.controller.process_audio_animation, interval=1000, blit=False)
