@@ -1,5 +1,8 @@
 import tkinter as tk
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
 
 class MainView(tk.Frame):
     """
@@ -15,14 +18,20 @@ class MainView(tk.Frame):
 
         # Insert widgets
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
-
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
 
+        self.plots = Figure(figsize=(5, 4), dpi=100)
+        self.plots.add_subplot(111).plot((1, 2, 3), (1, 2, 3))
+        canvas = FigureCanvasTkAgg(self.plots, master=self)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
+
         # Arrange elements
-        self.start_button.grid(row=0, column=0, sticky="nsew")
-        self.stop_button.grid(row=0, column=1, sticky="nsew")
+        self.start_button.grid(row=1, column=0, sticky="nsew")
+        self.stop_button.grid(row=1, column=1, sticky="nsew")
 
         self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
