@@ -1,5 +1,6 @@
 from model.audio_manager import AudioManager
 from view.main_view import MainView
+import numpy
 
 
 class SyncController:
@@ -37,5 +38,7 @@ class SyncController:
     def process_audio_animation(self, i):
         print("Executing animation")
         self.view.audio_plot.clear()
-        self.view.audio_plot.plot(b''.join(self.model.data))
-        print(self.model.data)
+        decoded = numpy.fromstring(b''.join(self.model.data), 'Float32')
+        self.view.curve, = self.view.audio_plot.plot(decoded)
+        self.view.canvas.draw()
+        return self.view.curve,

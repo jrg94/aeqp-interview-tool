@@ -24,6 +24,7 @@ class MainView(tk.Frame):
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
         self.audio_plot = self.plots.add_subplot(111)
+        self.curve, = self.audio_plot.plot([])
         self.canvas = FigureCanvasTkAgg(self.plots, master=self)
 
         # Arrange elements
@@ -100,4 +101,9 @@ class MainView(tk.Frame):
         :return: nothing
         """
         print("Launching animation")
-        self.ani = animation.FuncAnimation(self.plots, self.controller.process_audio_animation, interval=1000, blit=False)
+        self.ani = animation.FuncAnimation(
+            self.plots,
+            self.controller.process_audio_animation,
+            interval=100,
+            blit=True
+        )
