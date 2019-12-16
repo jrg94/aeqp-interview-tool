@@ -12,4 +12,8 @@ view = MainView(root)
 controller = SyncController(model, view)
 view.register_observer(controller)
 
+# TODO add audio visualization
+# TODO add timer which tracks recording time
+# TODO incorporate dongle recording
+
 root.mainloop()
