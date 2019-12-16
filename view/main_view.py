@@ -100,7 +100,6 @@ class MainView(tk.Frame):
 
         :return: nothing
         """
-        print("Launching animation")
         self.ani = animation.FuncAnimation(
             self.plots,
             self.controller.process_audio_animation,

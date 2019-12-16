@@ -36,9 +36,8 @@ class SyncController:
         self.view.update_stop_enabled(False)
 
     def process_audio_animation(self, i):
-        print("Executing animation")
         self.view.audio_plot.clear()
-        decoded = numpy.fromstring(b''.join(self.model.data), 'Float32')
+        decoded = numpy.fromstring(b''.join(self.model.data), numpy.int16)
         self.view.curve, = self.view.audio_plot.plot(decoded)
         self.view.canvas.draw()
         return self.view.curve,
