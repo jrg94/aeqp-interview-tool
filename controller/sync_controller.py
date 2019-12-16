@@ -36,6 +36,12 @@ class SyncController:
         self.view.update_stop_enabled(False)
 
     def process_audio_animation(self, i):
+        """
+        Animates the audio plot the audio plot.
+
+        :param i: the index of the current frame
+        :return: an iterable of items to be cleared
+        """
         self.view.audio_plot.clear()
         decoded = numpy.fromstring(b''.join(self.model.data), numpy.int16)
         self.view.curve, = self.view.audio_plot.plot(decoded)
