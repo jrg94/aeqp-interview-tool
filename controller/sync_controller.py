@@ -34,7 +34,8 @@ class SyncController:
     def process_participant_selection_event(self, name: str) -> None:
         """
         Processes the participant selection by updating the survey
-        text with our user's survey results.
+        text with our user's survey results. Survey results are pretty
+        printed.
 
         :param name: the name of the participant in the format of the _participant_name method
         :return: nothing
