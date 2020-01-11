@@ -31,7 +31,14 @@ class SyncController:
         participants.sort()
         self.view.update_option_menu(participants)
 
-    def process_participant_selection_event(self, name: str):
+    def process_participant_selection_event(self, name: str) -> None:
+        """
+        Processes the participant selection by updating the survey
+        text with our user's survey results.
+
+        :param name: the name of the participant in the format of the _participant_name method
+        :return: nothing
+        """
         last_and_first = name.replace(" ", "").split(",")
         survey_results = self.survey_model.get_survey_results()
         participant_results = next(
@@ -39,7 +46,8 @@ class SyncController:
             if item.get(SyncController.LAST_NAME_HEADER) == last_and_first[0]
             and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
         )
-        self.view.update_survey_text(str(participant_results))
+        survey_text = "\n".join([f'{k}: {v}' for k, v in participant_results.items()])
+        self.view.update_survey_text(survey_text)
 
     @staticmethod
     def _participant_name(item: dict):

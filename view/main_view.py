@@ -67,7 +67,7 @@ class MainView(tk.Frame):
     def load_participant_survey(self, *_) -> None:
         """
         Loads the participant survey based on updates to the option menu.
-        
+
         :param _: unused arguments that are passed by the trace function
         :return: nothing
         """
