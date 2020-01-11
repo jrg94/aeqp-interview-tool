@@ -23,8 +23,10 @@ class SyncController:
         """
         self.survey_model.set_path(path)
         self.survey_model.process_survey()
+        survey_results = self.survey_model.get_survey_results()
+        participants = [item.get("RecipientFirstName") for item in survey_results]
         self.view.update_survey_text(self.survey_model.get_survey_results())
-        self.view.update_option_menu(["Marry", "Jack"])
+        self.view.update_option_menu(participants)
 
     def process_start_event(self) -> None:
         """

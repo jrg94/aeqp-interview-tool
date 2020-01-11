@@ -74,7 +74,13 @@ class MainView(tk.Frame):
         self.survey_text.insert(tk.END, text)
         self.survey_text.config(state=tk.DISABLED)
 
-    def update_option_menu(self, participants: list):
+    def update_option_menu(self, participants: list) -> None:
+        """
+        Updates the option menu to include new participants.
+
+        :param participants: a list of participants
+        :return: nothing
+        """
         menu = self.participant_menu["menu"]
         menu.delete(1, "end")
         for participant in participants:
