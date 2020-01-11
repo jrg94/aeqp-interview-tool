@@ -46,11 +46,23 @@ class MainView(tk.Frame):
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
 
-    def load_survey_event(self):
+    def load_survey_event(self) -> None:
+        """
+        Prompts the user to select a file before passing off the
+        path to the controller.
+
+        :return: nothing
+        """
         path = filedialog.askopenfilename()
         self.controller.process_survey_load_event(path)
 
-    def update_survey_text(self, text):
+    def update_survey_text(self, text) -> None:
+        """
+        Updates the survey text area with the survey results.
+
+        :param text: the survey results in a readable format
+        :return: nothing
+        """
         self.survey_text.config(state=tk.NORMAL)
         self.survey_text.insert(tk.END, text)
         self.survey_text.config(state=tk.DISABLED)
