@@ -23,7 +23,7 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_text = tk.Text(root)
+        self.survey_text = tk.Text(root, state=tk.DISABLED)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
         self.audio_plot = self.plots.add_subplot(111)
@@ -35,7 +35,7 @@ class MainView(tk.Frame):
         self.stop_button.grid(row=1, column=1, sticky="nsew")
         self.file_select_button.grid(row=1, column=2, sticky="nsew")
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
-        self.survey_text.grid(row=0, column=2)
+        self.survey_text.grid(row=0, column=2, sticky="nsew")
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -51,7 +51,9 @@ class MainView(tk.Frame):
         self.controller.process_survey_load_event(path)
 
     def update_survey_text(self, text):
+        self.survey_text.config(state=tk.NORMAL)
         self.survey_text.insert(tk.END, text)
+        self.survey_text.config(state=tk.DISABLED)
 
     @staticmethod
     def _update_button_enabled(button: tk.Button, state: bool) -> None:
