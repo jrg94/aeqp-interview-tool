@@ -64,7 +64,13 @@ class MainView(tk.Frame):
         path = filedialog.askopenfilename()
         self.controller.process_survey_load_event(path)
 
-    def load_participant_survey(self, *args):
+    def load_participant_survey(self, *_) -> None:
+        """
+        Loads the participant survey based on updates to the option menu.
+        
+        :param _: unused arguments that are passed by the trace function
+        :return: nothing
+        """
         self.controller.process_participant_selection_event(str(self.option.get()))
 
     def update_survey_text(self, text: str) -> None:
