@@ -24,6 +24,7 @@ class SyncController:
         self.survey_model.set_path(path)
         self.survey_model.process_survey()
         self.view.update_survey_text(self.survey_model.get_survey_results())
+        self.view.update_option_menu(["Marry", "Jack"])
 
     def process_start_event(self) -> None:
         """
