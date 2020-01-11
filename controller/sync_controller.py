@@ -10,6 +10,9 @@ class SyncController:
     for the view by modifying the model.
     """
 
+    FIRST_NAME_HEADER = "RecipientFirstName"
+    LAST_NAME_HEADER = "RecipientLastName"
+
     def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, view: MainView):
         self.audio_model = audio_model
         self.survey_model = survey_model
@@ -24,9 +27,29 @@ class SyncController:
         self.survey_model.set_path(path)
         self.survey_model.process_survey()
         survey_results = self.survey_model.get_survey_results()
-        participants = [item.get("RecipientFirstName") for item in survey_results]
-        self.view.update_survey_text(self.survey_model.get_survey_results())
+        participants = [SyncController._participant_name(item) for item in survey_results]
+        participants.sort()
         self.view.update_option_menu(participants)
+
+    def process_participant_selection_event(self, name: str):
+        last_and_first = name.replace(" ", "").split(",")
+        survey_results = self.survey_model.get_survey_results()
+        participant_results = next(
+            item for item in survey_results
+            if item.get(SyncController.LAST_NAME_HEADER) == last_and_first[0]
+            and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
+        )
+        self.view.update_survey_text(str(participant_results))
+
+    @staticmethod
+    def _participant_name(item: dict):
+        """
+        A helper method which generates a participant's name from a survey response.
+
+        :param item: a survey response as a dictionary
+        :return: a string in the form "LAST_NAME, FIRST_NAME"
+        """
+        return f'{item.get(SyncController.LAST_NAME_HEADER)}, {item.get(SyncController.FIRST_NAME_HEADER)}'
 
     def process_start_event(self) -> None:
         """

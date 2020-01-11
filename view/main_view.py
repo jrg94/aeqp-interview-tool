@@ -22,6 +22,7 @@ class MainView(tk.Frame):
         self.ani = None
         self.option = tk.StringVar(self)
         self.option.set(MainView.PARTICIPANT_STRING)
+        self.option.trace("w", self.load_participant_survey)
 
         # Insert widgets
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
@@ -63,7 +64,10 @@ class MainView(tk.Frame):
         path = filedialog.askopenfilename()
         self.controller.process_survey_load_event(path)
 
-    def update_survey_text(self, text) -> None:
+    def load_participant_survey(self, *args):
+        self.controller.process_participant_selection_event(str(self.option.get()))
+
+    def update_survey_text(self, text: str) -> None:
         """
         Updates the survey text area with the survey results.
 
@@ -71,6 +75,7 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.survey_text.config(state=tk.NORMAL)
+        self.survey_text.delete('1.0', tk.END)
         self.survey_text.insert(tk.END, text)
         self.survey_text.config(state=tk.DISABLED)
 
@@ -82,7 +87,7 @@ class MainView(tk.Frame):
         :return: nothing
         """
         menu = self.participant_menu["menu"]
-        menu.delete(1, "end")
+        menu.delete(0, "end")
         for participant in participants:
             menu.add_command(
                 label=participant,
