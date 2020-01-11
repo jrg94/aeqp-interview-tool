@@ -23,7 +23,7 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_text = tk.Text(root, state=tk.DISABLED)
+        self.survey_text = tk.Text(self, state=tk.DISABLED)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
         self.audio_plot = self.plots.add_subplot(111)
