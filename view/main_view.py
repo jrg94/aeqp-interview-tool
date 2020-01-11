@@ -21,6 +21,7 @@ class MainView(tk.Frame):
         # Insert widgets
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
+        self.survey_text = tk.Text(root)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
         self.audio_plot = self.plots.add_subplot(111)
@@ -31,11 +32,13 @@ class MainView(tk.Frame):
         self.start_button.grid(row=1, column=0, sticky="nsew")
         self.stop_button.grid(row=1, column=1, sticky="nsew")
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
+        self.survey_text.grid(row=0, column=2, sticky="nsew", rowspan=2)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
