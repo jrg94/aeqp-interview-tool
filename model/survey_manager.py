@@ -13,3 +13,6 @@ class SurveyManager:
         if self.survey_path:
             with open(self.survey_path) as my_data:
                 self.survey_results = list(csv.DictReader(my_data))
+
+    def get_survey_results(self):
+        return self.survey_results
