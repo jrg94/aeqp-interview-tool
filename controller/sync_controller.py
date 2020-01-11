@@ -1,4 +1,5 @@
 from model.audio_manager import AudioManager
+from model.survey_manager import SurveyManager
 from view.main_view import MainView
 import numpy
 
@@ -9,9 +10,20 @@ class SyncController:
     for the view by modifying the model.
     """
 
-    def __init__(self, model: AudioManager, view: MainView):
-        self.model = model
+    def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, view: MainView):
+        self.audio_model = audio_model
+        self.survey_model = survey_model
         self.view = view
+
+    def process_survey_load_event(self, path) -> None:
+        """
+        Takes a path and loads it as a survey.
+
+        :return: nothing
+        """
+        self.survey_model.set_path(path)
+        self.survey_model.process_survey()
+        # TODO: populate view with survey results
 
     def process_start_event(self) -> None:
         """
@@ -19,7 +31,7 @@ class SyncController:
 
         :return: nothing
         """
-        self.model.start_recording()
+        self.audio_model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
         self.view.animate_plots()
@@ -30,8 +42,8 @@ class SyncController:
 
         :return: nothing
         """
-        self.model.stop_recording()
-        self.model.dump_recording()
+        self.audio_model.stop_recording()
+        self.audio_model.dump_recording()
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
 
@@ -43,7 +55,7 @@ class SyncController:
         :return: an iterable of items to be cleared
         """
         self.view.audio_plot.clear()
-        decoded = numpy.fromstring(b''.join(self.model.data), numpy.int16)
+        decoded = numpy.fromstring(b''.join(self.audio_model.data), numpy.int16)
         self.view.curve, = self.view.audio_plot.plot(decoded)
         self.view.canvas.draw()
         return self.view.curve,
