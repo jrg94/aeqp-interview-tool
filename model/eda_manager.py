@@ -43,7 +43,7 @@ class EDAManager:
         """
         Starts the EDA recording process.
 
-        :return: nothing 
+        :return: nothing
         """
         self.socket.connect((EDAManager.LOCALHOST, EDAManager.PORT))
         devices = self._get_devices()

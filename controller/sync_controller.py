@@ -1,4 +1,5 @@
 from model.audio_manager import AudioManager
+from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
 import numpy
@@ -13,9 +14,10 @@ class SyncController:
     FIRST_NAME_HEADER = "RecipientFirstName"
     LAST_NAME_HEADER = "RecipientLastName"
 
-    def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, view: MainView):
+    def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, eda_model: EDAManager, view: MainView):
         self.audio_model = audio_model
         self.survey_model = survey_model
+        self.eda_model = eda_model
         self.view = view
 
     def process_survey_load_event(self, path) -> None:
