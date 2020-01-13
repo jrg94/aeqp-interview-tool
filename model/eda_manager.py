@@ -53,6 +53,12 @@ class EDAManager:
         return devices
 
     def _connect_device(self, device_id) -> bool:
+        """
+        A helper method which connects to a specific device by ID
+
+        :param device_id: the ID of the device we want to connect to
+        :return: a boolean indicating whether or not the connection was successful
+        """
         device_connect_command = EDAManager._construct_command(EDAManager.CONNECT_DEVICE_COMMAND, device_id)
         self.socket.sendall(device_connect_command)
         response = self.socket.recv(1024).decode("utf-8")
