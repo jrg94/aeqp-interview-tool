@@ -1,8 +1,10 @@
 import socket
 import threading
 
+
 class EDAManager:
 
+    # Connection details
     LOCALHOST = "127.0.0.1"
     PORT = 28000
 
@@ -98,7 +100,11 @@ class EDAManager:
         :param stream: a data stream abbreviation according to documentation (e.g. BLOOD_VOLUME_PULSE)
         :return: True if the subscription was successful
         """
-        stream_subscribe_command = EDAManager._construct_command(EDAManager.STREAM_SUBSCRIBE_COMMAND, stream, EDAManager.STREAM_ON)
+        stream_subscribe_command = EDAManager._construct_command(
+            EDAManager.STREAM_SUBSCRIBE_COMMAND,
+            stream,
+            EDAManager.STREAM_ON
+        )
         self.socket.sendall(stream_subscribe_command)
         response = self.socket.recv(1024).decode("utf-8")
         status_code = response.strip().split(" ")[3]
@@ -108,4 +114,3 @@ class EDAManager:
 manager = EDAManager()
 manager.start_recording()
 manager.stop_recording()
-
