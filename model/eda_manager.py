@@ -25,6 +25,10 @@ class EDAManager:
     STATUS_CODE_ERR = "ERR"
     STATUS_CODE_OK = "OK"
 
+    # Empatica E4 On/Off
+    STREAM_ON = "ON"
+    STREAM_OFF = "OFF"
+
     COMMAND_SEPARATOR = "|"
 
     def __init__(self):
@@ -68,6 +72,13 @@ class EDAManager:
         """
         device_connect_command = EDAManager._construct_command(EDAManager.CONNECT_DEVICE_COMMAND, device_id)
         self.socket.sendall(device_connect_command)
+        response = self.socket.recv(1024).decode("utf-8")
+        status_code = response.strip().split(" ")[2]
+        return True if status_code == EDAManager.STATUS_CODE_OK else False
+
+    def _subscribe_stream(self, stream):
+        stream_subscribe_command = EDAManager._construct_command(EDAManager.STREAM_SUBSCRIBE_COMMAND, EDAManager.STREAM_ON)
+        self.socket.sendall(stream_subscribe_command)
         response = self.socket.recv(1024).decode("utf-8")
         status_code = response.strip().split(" ")[2]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
