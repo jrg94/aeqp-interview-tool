@@ -55,7 +55,15 @@ class EDAManager:
         raw_data = self.socket.recv(1024)
         while raw_data != "":
             raw_data = self.socket.recv(1024)
-            print(raw_data)
+            raw_data_list = raw_data.decode("utf-8").splitlines()
+            for sample in raw_data_list:
+                items = sample.split(" ")
+                self.data.append({
+                    "type": items[0],
+                    "time": items[1],
+                    "value": items[2:]
+                })
+                print(self.data[-1])
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
