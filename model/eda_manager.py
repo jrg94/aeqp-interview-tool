@@ -35,10 +35,16 @@ class EDAManager:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.response_log = list()
         self.data = list()
         self.stream_thread = threading.Thread(target=self._stream_data)
 
-    def start_recording(self):
+    def start_recording(self) -> None:
+        """
+        Starts the EDA recording process.
+
+        :return: nothing 
+        """
         self.socket.connect((EDAManager.LOCALHOST, EDAManager.PORT))
         devices = self._get_devices()
         device_id = devices[0].split(" ")[0]
@@ -47,23 +53,46 @@ class EDAManager:
             self._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
             self.stream_thread.start()
 
-    def stop_recording(self):
-        self.stream_thread.join()
-        self.socket.close()
+    def stop_recording(self) -> None:
+        """
+        Stops the EDA recording process.
 
-    def _stream_data(self):
-        raw_data = self.socket.recv(1024)
-        while raw_data != "":
+        :return: nothing
+        """
+        #self.stream_thread.join()
+        self.socket.close()
+        print(self.response_log)
+
+    def _stream_data(self) -> None:
+        """
+        Streams data from a socket and stores it as data samples.
+
+        :return: nothing
+        """
+        try:
             raw_data = self.socket.recv(1024)
-            raw_data_list = raw_data.decode("utf-8").splitlines()
-            for sample in raw_data_list:
-                items = sample.split(" ")
-                self.data.append({
-                    "type": items[0],
-                    "time": items[1],
-                    "value": items[2:]
-                })
-                print(self.data[-1])
+            while raw_data:
+                self._store_samples(raw_data)
+                raw_data = self.socket.recv(1024)
+        except socket.error:
+            pass
+
+    def _store_samples(self, raw_data) -> None:
+        """
+        A helper method which takes raw data and converts it to data samples.
+
+        :param raw_data: a raw string from a socket connection
+        :return: nothing
+        """
+        raw_data_list = raw_data.decode("utf-8").splitlines()
+        for sample in raw_data_list:
+            items = sample.split(" ")
+            self.data.append({
+                "type": items[0],
+                "time": items[1],
+                "value": items[2:]
+            })
+            print(self.data[-1])
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
@@ -85,6 +114,7 @@ class EDAManager:
         device_list_command = EDAManager._construct_command(EDAManager.LIST_DEVICES_COMMAND)
         self.socket.sendall(device_list_command)
         response = self.socket.recv(1024).decode("utf-8")
+        self.response_log.append(response)
         devices = list(map(str.strip, response.split(EDAManager.COMMAND_SEPARATOR)[1:]))
         return devices
 
@@ -96,10 +126,21 @@ class EDAManager:
         :return: a boolean indicating whether or not the connection was successful
         """
         device_connect_command = EDAManager._construct_command(EDAManager.CONNECT_DEVICE_COMMAND, device_id)
-        self.socket.sendall(device_connect_command)
-        response = self.socket.recv(1024).decode("utf-8")
-        status_code = response.strip().split(" ")[2]
-        return True if status_code == EDAManager.STATUS_CODE_OK else False
+        return self._send_command(device_connect_command, 2)
+
+    def _unsubscribe_stream(self, stream: str) -> bool:
+        """
+        Unsubscribes from a stream from a device.
+
+        :param stream: a data stream abbreviation according to documentation (e.g. BLOOD_VOLUME_PULSE)
+        :return: True if the unsubscription was successful
+        """
+        stream_unsubscribe_command = EDAManager._construct_command(
+            EDAManager.STREAM_SUBSCRIBE_COMMAND,
+            stream,
+            EDAManager.STREAM_OFF
+        )
+        return self._send_command(stream_unsubscribe_command, 3)
 
     def _subscribe_stream(self, stream: str) -> bool:
         """
@@ -113,10 +154,22 @@ class EDAManager:
             stream,
             EDAManager.STREAM_ON
         )
-        self.socket.sendall(stream_subscribe_command)
+        return self._send_command(stream_subscribe_command, 3)
+
+    def _send_command(self, command, status_index):
+        """
+        A helper method for issue commands and reading their responses.
+
+        :param command: a command to be issued over the socket
+        :param status_index: the index of the status code of the response
+        :return: True if the command was successful
+        """
+        self.socket.sendall(command)
         response = self.socket.recv(1024).decode("utf-8")
-        status_code = response.strip().split(" ")[3]
+        self.response_log.append(response)
+        status_code = response.strip().split(" ")[status_index]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
+
 
 
 manager = EDAManager()
