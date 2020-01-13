@@ -38,7 +38,7 @@ class EDAManager:
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
-        return bytes(f'{command}{" ".join(args)}\r\n', 'utf-8')
+        return bytes(f'{command} {" ".join(args)}\r\n', 'utf-8')
 
     def _get_devices(self) -> list:
         """
@@ -62,10 +62,15 @@ class EDAManager:
         device_connect_command = EDAManager._construct_command(EDAManager.CONNECT_DEVICE_COMMAND, device_id)
         self.socket.sendall(device_connect_command)
         response = self.socket.recv(1024).decode("utf-8")
-        status_code = response.split(" ")[2]
+        status_code = response.strip().split(" ")[2]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
 manager = EDAManager()
 manager.start_recording()
-print(manager._get_devices())
+devices = manager._get_devices()
+print(devices)
+device_id = devices[0].split(" ")[0]
+print(device_id)
+result = manager._connect_device(device_id)
+print(result)
 manager.stop_recording()
