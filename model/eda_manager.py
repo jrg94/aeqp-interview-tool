@@ -77,10 +77,10 @@ class EDAManager:
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
     def _subscribe_stream(self, stream):
-        stream_subscribe_command = EDAManager._construct_command(EDAManager.STREAM_SUBSCRIBE_COMMAND, EDAManager.STREAM_ON)
+        stream_subscribe_command = EDAManager._construct_command(EDAManager.STREAM_SUBSCRIBE_COMMAND, stream, EDAManager.STREAM_ON)
         self.socket.sendall(stream_subscribe_command)
         response = self.socket.recv(1024).decode("utf-8")
-        status_code = response.strip().split(" ")[2]
+        status_code = response.strip().split(" ")[3]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
 manager = EDAManager()
@@ -91,4 +91,6 @@ device_id = devices[0].split(" ")[0]
 print(device_id)
 result = manager._connect_device(device_id)
 print(result)
+result_2 = manager._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
+print(result_2)
 manager.stop_recording()
