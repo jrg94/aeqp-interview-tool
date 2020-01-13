@@ -38,6 +38,13 @@ class EDAManager:
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
+        """
+        Constructs an E4 command given the command and a set of arguments.
+
+        :param command: the action to be performed (e.g. LIST_DEVICES_COMMAND, CONNECT_DEVICE_COMMAND, etc.)
+        :param args: a list of potential arguments to pass to alongside the command
+        :return: the resulting command as a set of bytes
+        """
         return bytes(f'{command} {" ".join(args)}\r\n', 'utf-8')
 
     def _get_devices(self) -> list:
