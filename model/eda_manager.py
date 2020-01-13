@@ -30,8 +30,8 @@ class EDAManager:
         """
         device_list_command = EDAManager._construct_command(EDAManager.LIST_DEVICES_COMMAND)
         self.socket.sendall(device_list_command)
-        command = str(self.socket.recv(1024))
-        devices = command.split(EDAManager.COMMAND_SEPARATOR)[1:]
+        command = self.socket.recv(1024).decode("utf-8")
+        devices = list(map(str.strip, command.split(EDAManager.COMMAND_SEPARATOR)[1:]))
         return devices
 
 
