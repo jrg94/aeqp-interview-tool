@@ -1,5 +1,5 @@
 import socket
-
+import threading
 
 class EDAManager:
 
@@ -33,12 +33,27 @@ class EDAManager:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.data = list()
+        self.stream_thread = threading.Thread(target=self._stream_data)
 
     def start_recording(self):
         self.socket.connect((EDAManager.LOCALHOST, EDAManager.PORT))
+        devices = self._get_devices()
+        device_id = devices[0].split(" ")[0]
+        is_connected = self._connect_device(device_id)
+        if is_connected:
+            self._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
+            self.stream_thread.start()
 
     def stop_recording(self):
+        self.stream_thread.join()
         self.socket.close()
+
+    def _stream_data(self):
+        raw_data = self.socket.recv(1024)
+        while raw_data != "":
+            raw_data = self.socket.recv(1024)
+            print(raw_data)
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
@@ -63,7 +78,7 @@ class EDAManager:
         devices = list(map(str.strip, response.split(EDAManager.COMMAND_SEPARATOR)[1:]))
         return devices
 
-    def _connect_device(self, device_id) -> bool:
+    def _connect_device(self, device_id: str) -> bool:
         """
         A helper method which connects to a specific device by ID
 
@@ -76,21 +91,21 @@ class EDAManager:
         status_code = response.strip().split(" ")[2]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
-    def _subscribe_stream(self, stream):
+    def _subscribe_stream(self, stream: str) -> bool:
+        """
+        Subscribes to a stream of data from a device.
+
+        :param stream: a data stream abbreviation according to documentation (e.g. BLOOD_VOLUME_PULSE)
+        :return: True if the subscription was successful
+        """
         stream_subscribe_command = EDAManager._construct_command(EDAManager.STREAM_SUBSCRIBE_COMMAND, stream, EDAManager.STREAM_ON)
         self.socket.sendall(stream_subscribe_command)
         response = self.socket.recv(1024).decode("utf-8")
         status_code = response.strip().split(" ")[3]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
+
 manager = EDAManager()
 manager.start_recording()
-devices = manager._get_devices()
-print(devices)
-device_id = devices[0].split(" ")[0]
-print(device_id)
-result = manager._connect_device(device_id)
-print(result)
-result_2 = manager._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
-print(result_2)
 manager.stop_recording()
+
