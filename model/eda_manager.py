@@ -26,7 +26,7 @@ class EDAManager:
         """
         A helper method which returns a list of devices connected to the EDA server.
 
-        :return: a list of devices
+        :return: a list of devices (e.g. ['6D4ACD Empatica_E4'])
         """
         device_list_command = EDAManager._construct_command(EDAManager.LIST_DEVICES_COMMAND)
         self.socket.sendall(device_list_command)
