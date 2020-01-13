@@ -69,6 +69,7 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.start_recording()
+        self.eda_model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
         self.view.animate_plots()
@@ -81,6 +82,7 @@ class SyncController:
         """
         self.audio_model.stop_recording()
         self.audio_model.dump_recording()
+        self.eda_model.stop_recording()
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
 

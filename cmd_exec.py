@@ -16,8 +16,6 @@ view = MainView(root)
 controller = SyncController(audio_model, survey_model, eda_model, view)
 view.register_observer(controller)
 
-# TODO add audio visualization
 # TODO add timer which tracks recording time
-# TODO incorporate dongle recording
 
 root.mainloop()

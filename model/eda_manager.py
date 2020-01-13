@@ -34,10 +34,10 @@ class EDAManager:
     COMMAND_SEPARATOR = "|"
 
     def __init__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = None
         self.response_log = list()
         self.data = list()
-        self.stream_thread = threading.Thread(target=self._stream_data)
+        self.stream_thread = None
 
     def start_recording(self) -> None:
         """
@@ -45,12 +45,14 @@ class EDAManager:
 
         :return: nothing
         """
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((EDAManager.LOCALHOST, EDAManager.PORT))
         devices = self._get_devices()
         device_id = devices[0].split(" ")[0]
         is_connected = self._connect_device(device_id)
         if is_connected:
             self._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
+            self.stream_thread = threading.Thread(target=self._stream_data)
             self.stream_thread.start()
 
     def stop_recording(self) -> None:
@@ -59,9 +61,9 @@ class EDAManager:
 
         :return: nothing
         """
-        #self.stream_thread.join()
         self.socket.close()
-        print(self.response_log)
+        self.stream_thread.join()
+        self._clear_logs()
 
     def _stream_data(self) -> None:
         """
@@ -170,8 +172,11 @@ class EDAManager:
         status_code = response.strip().split(" ")[status_index]
         return True if status_code == EDAManager.STATUS_CODE_OK else False
 
+    def _clear_logs(self) -> None:
+        """
+        A helper method which clears out data.
 
-
-manager = EDAManager()
-manager.start_recording()
-manager.stop_recording()
+        :return: nothing
+        """
+        self.data = list()
+        self.response_log = list()
