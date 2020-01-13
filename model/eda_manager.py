@@ -15,9 +15,12 @@ class EDAManager:
     def start_recording(self):
         self.socket.connect((EDAManager.LOCALHOST, EDAManager.PORT))
 
+    def stop_recording(self):
+        self.socket.close()
+
     @staticmethod
     def _construct_command(command, *args) -> bytes:
-        return bytes(f'{command}{" ".join(args)}"\r\n"')
+        return bytes(f'{command}{" ".join(args)}\r\n', 'utf-8')
 
     def _get_devices(self) -> list:
         """
@@ -25,8 +28,14 @@ class EDAManager:
 
         :return: a list of devices
         """
-        self.socket.sendall(EDAManager._construct_command(EDAManager.LIST_DEVICES_COMMAND))
+        device_list_command = EDAManager._construct_command(EDAManager.LIST_DEVICES_COMMAND)
+        self.socket.sendall(device_list_command)
         command = str(self.socket.recv(1024))
         devices = command.split(EDAManager.COMMAND_SEPARATOR)[1:]
         return devices
 
+
+manager = EDAManager()
+manager.start_recording()
+print(manager._get_devices())
+manager.stop_recording()
