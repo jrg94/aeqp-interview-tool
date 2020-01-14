@@ -29,8 +29,8 @@ class MainView(tk.Frame):
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
         self.survey_view = SurveyView(self)
-        self.audio_plot = PlotView(self, "Audio Plot")
-        self.eda_plot = PlotView(self, "EDA Plot")
+        self.audio_plot = PlotView(self, "Audio Plot", "Time", "Amplitude")
+        self.eda_plot = PlotView(self, "EDA Plot", "Time", "Galvanic Skin Response")
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
         self.participant_menu.config(state=tk.DISABLED)
 
@@ -184,7 +184,7 @@ class SurveyView(tk.Frame):
 
 
 class PlotView(tk.Frame):
-    def __init__(self, root, title, *args, **kwargs):
+    def __init__(self, root, title, x_label, y_label, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
@@ -193,6 +193,8 @@ class PlotView(tk.Frame):
         self.canvas = FigureCanvasTkAgg(self.plots, master=self)
 
         self.plots.suptitle(title)
+        self.plot.set_xlabel(x_label)
+        self.plot.set_ylabel(y_label)
 
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
 
