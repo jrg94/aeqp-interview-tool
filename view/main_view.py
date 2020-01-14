@@ -184,6 +184,50 @@ class SurveyView(tk.Frame):
 
 
 class PlotView(tk.Frame):
+
+    EMOTIONS_TO_PROMPTS = {
+        "Enjoyment": {
+            "Before": [1, 2, 3, 4, 5],
+            "During": [],
+            "After": []
+        },
+        "Hope": {
+            "Before": [6, 7, 8, 9, 10, 11],
+            "During": [],
+            "After": []
+        },
+        "Pride": {
+            "Before": [12],
+            "During": [],
+            "After": []
+        },
+        "Anger": {
+            "Before": [13, 14],
+            "During": [],
+            "After": []
+        },
+        "Anxiety": {
+            "Before": [15, 16, 17, 18, 19],
+            "During": [],
+            "After": []
+        },
+        "Shame": {
+            "Before": [20],
+            "During": [],
+            "After": []
+        },
+        "Hopelessness": {
+            "Before": [21, 22, 23, 24, 25],
+            "During": [],
+            "After": []
+        },
+        "Relief": {
+            "Before": [],
+            "During": [],
+            "After": []
+        }
+    }
+
     def __init__(self, root, title, x_label, y_label, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
