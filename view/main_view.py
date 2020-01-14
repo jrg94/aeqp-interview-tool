@@ -189,7 +189,7 @@ class PlotView(tk.Frame):
         "Enjoyment": {
             "Before": [1, 2, 3, 4, 5],
             "During": [1, 2, 3],
-            "After": []
+            "After": [1, 2]
         },
         "Hope": {
             "Before": [6, 7, 8, 9, 10, 11],
@@ -199,12 +199,12 @@ class PlotView(tk.Frame):
         "Pride": {
             "Before": [12],
             "During": [6, 7],
-            "After": []
+            "After": [3, 4, 5, 6, 7, 8, 9]
         },
         "Anger": {
             "Before": [13, 14],
             "During": [8, 9],
-            "After": []
+            "After": [10, 11, 12, 13, 14, 15]
         },
         "Anxiety": {
             "Before": [15, 16, 17, 18, 19],
@@ -214,7 +214,7 @@ class PlotView(tk.Frame):
         "Shame": {
             "Before": [20],
             "During": [17, 18, 19, 20, 21],
-            "After": []
+            "After": [16, 17, 18, 19]
         },
         "Hopelessness": {
             "Before": [21, 22, 23, 24, 25],
@@ -224,7 +224,7 @@ class PlotView(tk.Frame):
         "Relief": {
             "Before": [],
             "During": [],
-            "After": []
+            "After": [20, 21, 22, 23, 24, 25]
         }
     }
 
