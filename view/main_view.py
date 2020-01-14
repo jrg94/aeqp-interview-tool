@@ -29,19 +29,15 @@ class MainView(tk.Frame):
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
         self.survey_view = SurveyView(self)
+        self.audio_plot_view = PlotView(self)
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
         self.participant_menu.config(state=tk.DISABLED)
-
-        self.plots = Figure(figsize=(5, 4), dpi=100)
-        self.audio_plot = self.plots.add_subplot(111)
-        self.curve, = self.audio_plot.plot([])
-        self.canvas = FigureCanvasTkAgg(self.plots, master=self)
 
         # Arrange elements
         self.start_button.grid(row=1, column=0, sticky="nsew")
         self.stop_button.grid(row=1, column=1, sticky="nsew")
         self.file_select_button.grid(row=1, column=2, sticky="nsew")
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
+        self.audio_plot_view.grid(row=0, column=0, sticky="nsew", columnspan=2)
         self.survey_view.grid(row=0, column=2, sticky="nsew", columnspan=2)
         self.participant_menu.grid(row=1, column=3, sticky="nsew")
 
@@ -150,7 +146,7 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.ani = animation.FuncAnimation(
-            self.plots,
+            self.audio_plot_view.plots,
             self.controller.process_audio_animation,
             interval=100,
             blit=True
@@ -181,3 +177,15 @@ class SurveyView(tk.Frame):
         self.survey_text.delete('1.0', tk.END)
         self.survey_text.insert(tk.END, text)
         self.survey_text.config(state=tk.DISABLED)
+
+
+class PlotView(tk.Frame):
+    def __init__(self, root, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+
+        self.plots = Figure(figsize=(5, 4), dpi=100)
+        self.audio_plot = self.plots.add_subplot(111)
+        self.curve, = self.audio_plot.plot([])
+        self.canvas = FigureCanvasTkAgg(self.plots, master=self)
+
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
