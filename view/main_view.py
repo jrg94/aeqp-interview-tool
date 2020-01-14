@@ -188,37 +188,37 @@ class PlotView(tk.Frame):
     EMOTIONS_TO_PROMPTS = {
         "Enjoyment": {
             "Before": [1, 2, 3, 4, 5],
-            "During": [],
+            "During": [1, 2, 3],
             "After": []
         },
         "Hope": {
             "Before": [6, 7, 8, 9, 10, 11],
-            "During": [],
+            "During": [4, 5],
             "After": []
         },
         "Pride": {
             "Before": [12],
-            "During": [],
+            "During": [6, 7],
             "After": []
         },
         "Anger": {
             "Before": [13, 14],
-            "During": [],
+            "During": [8, 9],
             "After": []
         },
         "Anxiety": {
             "Before": [15, 16, 17, 18, 19],
-            "During": [],
+            "During": [10, 11, 12, 13, 14, 15, 16],
             "After": []
         },
         "Shame": {
             "Before": [20],
-            "During": [],
+            "During": [17, 18, 19, 20, 21],
             "After": []
         },
         "Hopelessness": {
             "Before": [21, 22, 23, 24, 25],
-            "During": [],
+            "During": [22, 23, 24, 25, 26, 27],
             "After": []
         },
         "Relief": {
