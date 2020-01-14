@@ -93,8 +93,8 @@ class SyncController:
         :param i: the index of the current frame
         :return: an iterable of items to be cleared
         """
-        self.view.audio_plot_view.audio_plot.clear()
+        self.view.audio_plot.audio_plot.clear()
         decoded = numpy.fromstring(b''.join(self.audio_model.data), numpy.int16)
-        self.view.curve, = self.view.audio_plot_view.audio_plot.plot(decoded)
-        self.view.audio_plot_view.canvas.draw()
+        self.view.curve, = self.view.audio_plot.audio_plot.plot(decoded)
+        self.view.audio_plot.canvas.draw()
         return self.view.curve,

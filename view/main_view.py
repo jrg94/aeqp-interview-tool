@@ -29,23 +29,27 @@ class MainView(tk.Frame):
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
         self.survey_view = SurveyView(self)
-        self.audio_plot_view = PlotView(self)
+        self.audio_plot = PlotView(self, "Audio Plot")
+        self.eda_plot = PlotView(self, "EDA Plot")
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
         self.participant_menu.config(state=tk.DISABLED)
 
         # Arrange elements
-        self.start_button.grid(row=1, column=0, sticky="nsew")
-        self.stop_button.grid(row=1, column=1, sticky="nsew")
-        self.file_select_button.grid(row=1, column=2, sticky="nsew")
-        self.audio_plot_view.grid(row=0, column=0, sticky="nsew", columnspan=2)
-        self.survey_view.grid(row=0, column=2, sticky="nsew", columnspan=2)
-        self.participant_menu.grid(row=1, column=3, sticky="nsew")
+        self.file_select_button.grid(row=0, column=0, sticky="nsew")
+        self.participant_menu.grid(row=0, column=1, sticky="nsew")
+        self.start_button.grid(row=0, column=2, sticky="nsew")
+        self.stop_button.grid(row=0, column=3, sticky="nsew")
+        self.survey_view.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
+        self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=1)
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
@@ -146,7 +150,7 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.ani = animation.FuncAnimation(
-            self.audio_plot_view.plots,
+            self.audio_plot.plots,
             self.controller.process_audio_animation,
             interval=100,
             blit=True
@@ -180,12 +184,17 @@ class SurveyView(tk.Frame):
 
 
 class PlotView(tk.Frame):
-    def __init__(self, root, *args, **kwargs):
+    def __init__(self, root, title, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
         self.plots = Figure(figsize=(5, 4), dpi=100)
-        self.audio_plot = self.plots.add_subplot(111)
-        self.curve, = self.audio_plot.plot([])
+        self.plot = self.plots.add_subplot(111)
+        self.curve, = self.plot.plot([])
         self.canvas = FigureCanvasTkAgg(self.plots, master=self)
 
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
+        self.plots.suptitle(title)
+
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
