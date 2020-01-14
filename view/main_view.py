@@ -28,7 +28,7 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_text = tk.Text(self, state=tk.DISABLED)
+        self.survey_view = SurveyView(self)
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
         self.participant_menu.config(state=tk.DISABLED)
 
@@ -42,7 +42,7 @@ class MainView(tk.Frame):
         self.stop_button.grid(row=1, column=1, sticky="nsew")
         self.file_select_button.grid(row=1, column=2, sticky="nsew")
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
-        self.survey_text.grid(row=0, column=2, sticky="nsew", columnspan=2)
+        self.survey_view.grid(row=0, column=2, sticky="nsew", columnspan=2)
         self.participant_menu.grid(row=1, column=3, sticky="nsew")
 
         self.rowconfigure(0, weight=1)
@@ -72,18 +72,6 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.controller.process_participant_selection_event(str(self.option.get()))
-
-    def update_survey_text(self, text: str) -> None:
-        """
-        Updates the survey text area with the survey results.
-
-        :param text: the survey results in a readable format
-        :return: nothing
-        """
-        self.survey_text.config(state=tk.NORMAL)
-        self.survey_text.delete('1.0', tk.END)
-        self.survey_text.insert(tk.END, text)
-        self.survey_text.config(state=tk.DISABLED)
 
     def update_option_menu(self, participants: list) -> None:
         """
@@ -167,3 +155,29 @@ class MainView(tk.Frame):
             interval=100,
             blit=True
         )
+
+
+class SurveyView(tk.Frame):
+    """
+    A custom survey element which can be reused and contained.
+    """
+
+    def __init__(self, root, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+
+        self.survey_text = tk.Text(self, state=tk.DISABLED)
+        self.survey_text.grid(row=0, column=0, sticky="nsew")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
+    def update_survey_text(self, text: str) -> None:
+        """
+        Updates the survey text area with the survey results.
+
+        :param text: the survey results in a readable format
+        :return: nothing
+        """
+        self.survey_text.config(state=tk.NORMAL)
+        self.survey_text.delete('1.0', tk.END)
+        self.survey_text.insert(tk.END, text)
+        self.survey_text.config(state=tk.DISABLED)

@@ -50,7 +50,7 @@ class SyncController:
             and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
         )
         survey_text = "\n".join([f'{k}: {v}' for k, v in participant_results.items()])
-        self.view.update_survey_text(survey_text)
+        self.view.survey_view.update_survey_text(survey_text)
 
     @staticmethod
     def _participant_name(item: dict):
