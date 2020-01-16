@@ -109,11 +109,12 @@ def main():
     root.withdraw()
 
     file_paths = filedialog.askopenfilenames()
-    surveys = load_surveys(file_paths)
-    master_survey = []
-    for i in range(len(surveys[SEGMENTS[0]]["survey"])):
-        master_survey.append(get_student_responses(surveys, i))
-    dump_csv(master_survey)
+    if file_paths:
+        surveys = load_surveys(file_paths)
+        master_survey = []
+        for i in range(len(surveys[SEGMENTS[0]]["survey"])):
+            master_survey.append(get_student_responses(surveys, i))
+        dump_csv(master_survey)
 
 
 main()
