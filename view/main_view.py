@@ -28,28 +28,28 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_text = tk.Text(self, state=tk.DISABLED)
+        self.survey_view = SurveyView(self)
+        self.audio_plot = PlotView(self, "Audio Plot", "Time", "Amplitude")
+        self.eda_plot = PlotView(self, "EDA Plot", "Time", "Galvanic Skin Response")
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
         self.participant_menu.config(state=tk.DISABLED)
 
-        self.plots = Figure(figsize=(5, 4), dpi=100)
-        self.audio_plot = self.plots.add_subplot(111)
-        self.curve, = self.audio_plot.plot([])
-        self.canvas = FigureCanvasTkAgg(self.plots, master=self)
-
         # Arrange elements
-        self.start_button.grid(row=1, column=0, sticky="nsew")
-        self.stop_button.grid(row=1, column=1, sticky="nsew")
-        self.file_select_button.grid(row=1, column=2, sticky="nsew")
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew", columnspan=2)
-        self.survey_text.grid(row=0, column=2, sticky="nsew", columnspan=2)
-        self.participant_menu.grid(row=1, column=3, sticky="nsew")
+        self.file_select_button.grid(row=0, column=0, sticky="nsew")
+        self.participant_menu.grid(row=0, column=1, sticky="nsew")
+        self.start_button.grid(row=0, column=2, sticky="nsew")
+        self.stop_button.grid(row=0, column=3, sticky="nsew")
+        self.survey_view.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
+        self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=1)
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
@@ -72,18 +72,6 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.controller.process_participant_selection_event(str(self.option.get()))
-
-    def update_survey_text(self, text: str) -> None:
-        """
-        Updates the survey text area with the survey results.
-
-        :param text: the survey results in a readable format
-        :return: nothing
-        """
-        self.survey_text.config(state=tk.NORMAL)
-        self.survey_text.delete('1.0', tk.END)
-        self.survey_text.insert(tk.END, text)
-        self.survey_text.config(state=tk.DISABLED)
 
     def update_option_menu(self, participants: list) -> None:
         """
@@ -162,8 +150,54 @@ class MainView(tk.Frame):
         :return: nothing
         """
         self.ani = animation.FuncAnimation(
-            self.plots,
+            self.audio_plot.plots,
             self.controller.process_audio_animation,
             interval=100,
             blit=True
         )
+
+
+class SurveyView(tk.Frame):
+    """
+    A custom survey element which can be reused and contained.
+    """
+
+    def __init__(self, root, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+
+        self.survey_text = tk.Text(self, state=tk.DISABLED)
+        self.survey_text.grid(row=0, column=0, sticky="nsew")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
+    def update_survey_text(self, text: str) -> None:
+        """
+        Updates the survey text area with the survey results.
+
+        :param text: the survey results in a readable format
+        :return: nothing
+        """
+        self.survey_text.config(state=tk.NORMAL)
+        self.survey_text.delete('1.0', tk.END)
+        self.survey_text.insert(tk.END, text)
+        self.survey_text.config(state=tk.DISABLED)
+
+
+class PlotView(tk.Frame):
+
+    def __init__(self, root, title, x_label, y_label, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+
+        self.plots = Figure(figsize=(5, 4), dpi=100)
+        self.plot = self.plots.add_subplot(111)
+        self.curve, = self.plot.plot([])
+        self.canvas = FigureCanvasTkAgg(self.plots, master=self)
+
+        self.plots.suptitle(title)
+        self.plot.set_xlabel(x_label)
+        self.plot.set_ylabel(y_label)
+
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)

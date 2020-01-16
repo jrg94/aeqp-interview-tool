@@ -1,4 +1,5 @@
 from model.audio_manager import AudioManager
+from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
 import numpy
@@ -13,9 +14,10 @@ class SyncController:
     FIRST_NAME_HEADER = "RecipientFirstName"
     LAST_NAME_HEADER = "RecipientLastName"
 
-    def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, view: MainView):
+    def __init__(self, audio_model: AudioManager, survey_model: SurveyManager, eda_model: EDAManager, view: MainView):
         self.audio_model = audio_model
         self.survey_model = survey_model
+        self.eda_model = eda_model
         self.view = view
 
     def process_survey_load_event(self, path) -> None:
@@ -48,7 +50,7 @@ class SyncController:
             and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
         )
         survey_text = "\n".join([f'{k}: {v}' for k, v in participant_results.items()])
-        self.view.update_survey_text(survey_text)
+        self.view.survey_view.update_survey_text(survey_text)
 
     @staticmethod
     def _participant_name(item: dict):
@@ -67,6 +69,7 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.start_recording()
+        self.eda_model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
         self.view.animate_plots()
@@ -79,6 +82,7 @@ class SyncController:
         """
         self.audio_model.stop_recording()
         self.audio_model.dump_recording()
+        self.eda_model.stop_recording()
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
 
@@ -89,8 +93,8 @@ class SyncController:
         :param i: the index of the current frame
         :return: an iterable of items to be cleared
         """
-        self.view.audio_plot.clear()
+        self.view.audio_plot.plot.clear()
         decoded = numpy.fromstring(b''.join(self.audio_model.data), numpy.int16)
-        self.view.curve, = self.view.audio_plot.plot(decoded)
-        self.view.canvas.draw()
+        self.view.curve, = self.view.audio_plot.plot.plot(decoded)
+        self.view.audio_plot.canvas.draw()
         return self.view.curve,

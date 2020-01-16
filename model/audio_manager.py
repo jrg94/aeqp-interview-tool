@@ -17,7 +17,7 @@ class AudioManager:
         self.stream = None
         self.data = list()
 
-    def stream_chunk(self, in_data, frame_count, time_info, status) -> tuple:
+    def _stream_chunk(self, in_data, frame_count, time_info, status) -> tuple:
         """
         Reads in the latest information from the audio stream, stores the results,
         and keeps the stream alive.
@@ -42,7 +42,7 @@ class AudioManager:
                                       rate=RATE,
                                       input=True,
                                       frames_per_buffer=CHUNK,
-                                      stream_callback=self.stream_chunk)
+                                      stream_callback=self._stream_chunk)
 
     def stop_recording(self) -> None:
         """
