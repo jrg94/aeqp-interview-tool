@@ -8,19 +8,26 @@ SEGMENTS = ("before", "during", "after")
 FIRST_NAME = "RecipientFirstName"
 LAST_NAME = "RecipientLastName"
 
-
-def get_names(survey_results: list) -> list:
-    names = []
-    for row in survey_results:
-        names.append({
-            "LastName": row.get("RecipientLastName"),
-            "FirstName": row.get("RecipientFirstName"),
-
-        })
-    return names
+EMOTIONS_TO_PROMPTS = {
+    "before": ["enjoyment", "enjoyment", "enjoyment", "enjoyment", "enjoyment", "hope", "hope", "hope", "hope", "hope",
+               "hope", "pride", "anger", "anger", "anxiety", "anxiety", "anxiety", "anxiety", "anxiety", "shame",
+               "hopelessness", "hopelessness", "hopelessness", "hopelessness", "hopelessness"],
+    "during": ["enjoyment", "enjoyment", "enjoyment", "hope", "hope", "pride", "pride", "anger", "anger", "anxiety",
+               "anxiety", "anxiety", "anxiety", "anxiety", "anxiety", "anxiety", "shame", "shame", "shame", "shame",
+               "shame", "hopelessness", "hopelessness", "hopelessness", "hopelessness", "hopelessness", "hopelessness"],
+    "after": ["enjoyment", "enjoyment", "pride", "pride", "pride", "pride", "pride", "pride", "pride", "anger", "anger",
+              "anger", "anger", "anger", "anger", "shame", "shame", "shame", "shame", "relief", "relief", "relief",
+              "relief", "relief", "relief"]
+}
 
 
 def get_survey_segment(file_name: str):
+    """
+    Gets the segment of a survey file (before, during, after)
+
+    :param file_name: the name of the file
+    :return: the segment as a string
+    """
     search_string = file_name.lower().split(os.sep)[-1]
     for segment in SEGMENTS:
         if segment in search_string:
@@ -56,19 +63,31 @@ def get_student_responses(surveys: dict, index: int):
     for segment in SEGMENTS:
         metadata = surveys[segment]["metadata1"]
         for participant in surveys[segment]["survey"]:
-            if participant[FIRST_NAME] == student_responses[FIRST_NAME] and participant[LAST_NAME] == student_responses[LAST_NAME]:
+            if participant[FIRST_NAME] == student_responses[FIRST_NAME] \
+                    and participant[LAST_NAME] == student_responses[LAST_NAME]:
                 load_questions(student_responses, participant, segment, metadata)
     return student_responses
 
 
-def load_questions(responses: dict, participant: dict, segment: str, metadata: dict):
-    for i in range(1, 28):
+def load_questions(responses: dict, participant: dict, segment: str, metadata: dict) -> None:
+    """
+    Loads the questions into the survey alongside their description and subscale.
+
+    :param responses: the final list of responses
+    :param participant: the current participant
+    :param segment: the current segment (before, during, after)
+    :param metadata: the metadata for this segment
+    :return: nothing
+    """
+    for i in range(len(EMOTIONS_TO_PROMPTS[segment])):
         question_base = f'Q1_{i}'
         if question_base in participant:
             question = f'{question_base}_{segment}'
             responses[question] = participant[question_base]
             description = f'{question}_description'
             responses[description] = metadata[question_base].split("-")[-1].strip()
+            sub_scale = f'{question}_subscale'
+            responses[sub_scale] = EMOTIONS_TO_PROMPTS[segment][i]
 
 
 def main():
