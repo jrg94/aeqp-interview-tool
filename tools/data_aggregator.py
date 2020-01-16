@@ -55,7 +55,14 @@ def load_surveys(file_paths: list) -> dict:
     return surveys
 
 
-def get_student_responses(surveys: dict, index: int):
+def get_student_responses(surveys: dict, index: int) -> list:
+    """
+    Returns a list of student responses which are aggregated from three different surveys.
+
+    :param surveys: a list of surveys (preferably 3)
+    :param index: the current row of the before survey
+    :return: all student responses a single list
+    """
     student_responses = {
         FIRST_NAME: surveys[SEGMENTS[0]]["survey"][index][FIRST_NAME],
         LAST_NAME: surveys[SEGMENTS[0]]["survey"][index][LAST_NAME]
