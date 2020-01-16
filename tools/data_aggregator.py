@@ -55,13 +55,13 @@ def load_surveys(file_paths: list) -> dict:
     return surveys
 
 
-def get_student_responses(surveys: dict, index: int) -> list:
+def get_student_responses(surveys: dict, index: int) -> dict:
     """
     Returns a list of student responses which are aggregated from three different surveys.
 
-    :param surveys: a list of surveys (preferably 3)
+    :param surveys: a dictionary of surveys (preferably 3)
     :param index: the current row of the before survey
-    :return: all student responses a single list
+    :return: all student responses a single dictionary
     """
     student_responses = {
         FIRST_NAME: surveys[SEGMENTS[0]]["survey"][index][FIRST_NAME],
@@ -97,6 +97,13 @@ def load_questions(responses: dict, participant: dict, segment: str, metadata: d
             responses[sub_scale] = EMOTIONS_TO_PROMPTS[segment][i]
 
 
+def dump_csv(master_survey: list):
+    with open("../data/aggregate_survey.csv", "w", newline="") as dump:
+        writer = csv.DictWriter(dump, master_survey[0].keys())
+        writer.writeheader()
+        writer.writerows(master_survey)
+
+
 def main():
     root = tk.Tk()
     root.withdraw()
@@ -106,7 +113,7 @@ def main():
     master_survey = []
     for i in range(len(surveys[SEGMENTS[0]]["survey"])):
         master_survey.append(get_student_responses(surveys, i))
-    print(master_survey)
+    dump_csv(master_survey)
 
 
 main()
