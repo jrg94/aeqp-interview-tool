@@ -177,7 +177,7 @@ class SurveyView(tk.Frame):
         self.columnconfigure(0, weight=1)
         for subscale, segments in subscales_to_segments.items():
             questions = [questions for segment, questions in segments.items()]
-            table = TableView(self, subscale, questions, survey)
+            table = TableView(self, subscale, questions, survey, pady=10, padx=10)
             table.grid(row=row, column=0, sticky='nsew')
             self.rowconfigure(row, weight=1)
             row += 1
@@ -197,14 +197,17 @@ class TableView(tk.Frame):
             segment_label.grid(row=1, column=i*2, columnspan=2, sticky="nsew")
             self.rowconfigure(1, weight=1)
             for j in range(rows):
+                row = j + 2
+                column = 2 * i
                 text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
                 item_label = tk.Label(self, text=text, pady=10)
-                item_label.grid(row=j+2, column=2*i+1, sticky="nsew")
+                item_label.grid(row=row, column=column+1, sticky="nsew")
                 desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
-                item_desc = tk.Label(self, text=desc, pady=10)
-                item_desc.grid(row=j+2, column=2*i, sticky="nsew")
-                self.rowconfigure(j+2, weight=1)
-                self.columnconfigure(2*i + 1, weight=1)
+                item_desc = tk.Label(self, text=desc, pady=10, anchor="w")
+                item_desc.grid(row=row, column=column, sticky="nsew")
+                self.rowconfigure(row, weight=1)
+                self.columnconfigure(column, weight=1)
+                self.columnconfigure(column+1, weight=1)
 
     @staticmethod
     def get_segment(index: int):
