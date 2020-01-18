@@ -28,7 +28,9 @@ class MainView(tk.Frame):
         self.start_button = tk.Button(self, text="Start", command=self.start_action)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_view = SurveyView(self)
+        self.survey_canvas = tk.Canvas(self)
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.survey_canvas.yview)
+        self.survey_view = SurveyView(self.survey_canvas)
         self.audio_plot = PlotView(self, "Audio Plot", "Time", "Amplitude")
         self.eda_plot = PlotView(self, "EDA Plot", "Time", "Galvanic Skin Response")
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
@@ -39,7 +41,8 @@ class MainView(tk.Frame):
         self.participant_menu.grid(row=0, column=1, sticky="nsew")
         self.start_button.grid(row=0, column=2, sticky="nsew")
         self.stop_button.grid(row=0, column=3, sticky="nsew")
-        self.survey_view.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.survey_canvas.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.scrollbar.grid(row=1, column=5, sticky="ns")
         self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
         self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
@@ -50,6 +53,17 @@ class MainView(tk.Frame):
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
         self.columnconfigure(3, weight=1)
+
+        # Setup scroll window
+        self.survey_view.bind(
+            "<Configure>",
+            lambda e: self.survey_canvas.configure(
+                scrollregion=self.survey_canvas.bbox("all")
+            )
+        )
+
+        self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="nw")
+        self.survey_canvas.configure(yscrollcommand=self.scrollbar.set)
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
