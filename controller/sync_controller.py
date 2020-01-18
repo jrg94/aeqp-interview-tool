@@ -3,6 +3,7 @@ from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
 import numpy
+import os
 
 
 class SyncController:
@@ -82,7 +83,7 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.start_recording()
-        self.eda_model.start_recording()
+        #self.eda_model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
         self.view.animate_plots()
@@ -94,7 +95,9 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.stop_recording()
-        self.audio_model.dump_recording()
+        file_name = self.view.get_output_file_name()
+        audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
+        self.audio_model.dump_recording(audio_file_path)
         self.eda_model.stop_recording()
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
@@ -111,3 +114,15 @@ class SyncController:
         self.view.curve, = self.view.audio_plot.plot.plot(decoded)
         self.view.audio_plot.canvas.draw()
         return self.view.curve,
+
+    @staticmethod
+    def get_fresh_output_path(filename, data_type):
+        i = 1
+        file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+        if os.path.isdir("data"):
+            while os.path.isfile(file_path):
+                file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+                i += 1
+        else:
+            os.mkdir("data")
+        return file_path

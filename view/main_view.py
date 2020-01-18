@@ -175,6 +175,11 @@ class MainView(tk.Frame):
             blit=True
         )
 
+    def get_output_file_name(self):
+        participant_name = self.option.get()
+        file_name = "_".join(participant_name.lower().replace(" ", "").split(","))
+        return file_name
+
 
 class SurveyView(tk.Frame):
     """
