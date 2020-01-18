@@ -177,7 +177,7 @@ class SurveyView(tk.Frame):
         self.columnconfigure(0, weight=1)
         for subscale, segments in subscales_to_segments.items():
             questions = [questions for segment, questions in segments.items()]
-            table = TableView(self, subscale, questions)
+            table = TableView(self, subscale, questions, survey)
             table.grid(row=row, column=0, sticky='nsew')
             self.rowconfigure(row, weight=1)
             row += 1
@@ -185,19 +185,34 @@ class SurveyView(tk.Frame):
 
 class TableView(tk.Frame):
 
-    def __init__(self, root, title, grid, *args, **kwargs):
+    def __init__(self, root, title, grid, survey, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
-        title_text = tk.Label(self, text=title)
-        title_text.grid(row=0, column=0, columnspan=len(grid))
+        title_text = tk.Label(self, text=title, pady=10)
+        title_text.grid(row=0, column=0, columnspan=len(grid)*2)
         self.rowconfigure(0, weight=1)
         rows = max([len(item) for item in grid])
         for i in range(len(grid)):
+            segment = TableView.get_segment(i)
+            segment_label = tk.Label(self, text=segment, pady=10)
+            segment_label.grid(row=1, column=i*2, columnspan=2, sticky="nsew")
+            self.rowconfigure(1, weight=1)
             for j in range(rows):
-                text = "" if len(grid[i]) <= j else grid[i][j]
-                item = tk.Label(self, text=text)
-                item.grid(row=j+1, column=i, sticky="nsew")
-                self.rowconfigure(j+1, weight=1)
-                self.columnconfigure(i, weight=1)
+                text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
+                item_label = tk.Label(self, text=text, pady=10)
+                item_label.grid(row=j+2, column=2*i+1, sticky="nsew")
+                desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
+                item_desc = tk.Label(self, text=desc, pady=10)
+                item_desc.grid(row=j+2, column=2*i, sticky="nsew")
+                self.rowconfigure(j+2, weight=1)
+                self.columnconfigure(2*i + 1, weight=1)
+
+    @staticmethod
+    def get_segment(index: int):
+        return [
+            "before",
+            "during",
+            "after"
+        ][index]
 
 
 class PlotView(tk.Frame):
