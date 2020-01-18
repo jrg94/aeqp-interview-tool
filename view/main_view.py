@@ -62,7 +62,7 @@ class MainView(tk.Frame):
             )
         )
 
-        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="center")
+        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="n")
         self.survey_canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.survey_canvas.bind(
