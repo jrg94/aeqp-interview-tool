@@ -1,9 +1,11 @@
+import os
+
+import numpy
+
 from model.audio_manager import AudioManager
 from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
-import numpy
-import os
 
 
 class SyncController:
@@ -83,7 +85,7 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.start_recording()
-        #self.eda_model.start_recording()
+        self.eda_model.start_recording()
         self.view.update_start_enabled(False)
         self.view.update_stop_enabled(True)
         self.view.animate_plots()
@@ -95,10 +97,13 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.stop_recording()
+        self.eda_model.stop_recording()
+
         file_name = self.view.get_output_file_name()
         audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
+        eda_file_path = SyncController.get_fresh_output_path(file_name, "eda")
         self.audio_model.dump_recording(audio_file_path)
-        self.eda_model.stop_recording()
+
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
 
