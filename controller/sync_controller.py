@@ -1,8 +1,11 @@
+import os
+
+import numpy
+
 from model.audio_manager import AudioManager
 from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
-import numpy
 
 
 class SyncController:
@@ -49,8 +52,21 @@ class SyncController:
             if item.get(SyncController.LAST_NAME_HEADER) == last_and_first[0]
             and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
         )
-        survey_text = "\n".join([f'{k}: {v}' for k, v in participant_results.items()])
-        self.view.survey_view.update_survey_text(survey_text)
+        sub_scales_to_segments = {}
+        sub_scales = {participant_results[key] for key in participant_results if "subscale" in key}
+        for sub_scale in sub_scales:
+            sub_scale_questions = [
+                "_".join(key.split("_")[1:3])
+                for key, value in participant_results.items()
+                if sub_scale == value
+            ]
+            sub_scales_to_segments[sub_scale] = {
+                "before": [x for x in sub_scale_questions if "before" in x],
+                "during": [x for x in sub_scale_questions if "during" in x],
+                "after": [x for x in sub_scale_questions if "after" in x]
+            }
+        self.view.survey_view.update_survey_text(participant_results, sub_scales_to_segments)
+        self.view.update_start_enabled(True)
 
     @staticmethod
     def _participant_name(item: dict):
@@ -81,8 +97,13 @@ class SyncController:
         :return: nothing
         """
         self.audio_model.stop_recording()
-        self.audio_model.dump_recording()
         self.eda_model.stop_recording()
+
+        file_name = self.view.get_output_file_name()
+        audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
+        eda_file_path = SyncController.get_fresh_output_path(file_name, "eda")
+        self.audio_model.dump_recording(audio_file_path)
+
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
 
@@ -98,3 +119,15 @@ class SyncController:
         self.view.curve, = self.view.audio_plot.plot.plot(decoded)
         self.view.audio_plot.canvas.draw()
         return self.view.curve,
+
+    @staticmethod
+    def get_fresh_output_path(filename, data_type):
+        i = 1
+        file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+        if os.path.isdir("data"):
+            while os.path.isfile(file_path):
+                file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+                i += 1
+        else:
+            os.mkdir("data")
+        return file_path

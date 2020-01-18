@@ -89,11 +89,11 @@ def load_questions(responses: dict, participant: dict, segment: str, metadata: d
     for i in range(len(EMOTIONS_TO_PROMPTS[segment])):
         question_base = f'Q1_{i}'
         if question_base in participant:
-            question = f'{question_base}_{segment}'
+            question = f'{question_base}_{segment}_question'
             responses[question] = participant[question_base]
-            description = f'{question}_description'
+            description = f'{question_base}_{segment}_description'
             responses[description] = metadata[question_base].split("-")[-1].strip()
-            sub_scale = f'{question}_subscale'
+            sub_scale = f'{question_base}_{segment}_subscale'
             responses[sub_scale] = EMOTIONS_TO_PROMPTS[segment][i]
 
 

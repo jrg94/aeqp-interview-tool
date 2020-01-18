@@ -25,10 +25,12 @@ class MainView(tk.Frame):
         self.option.trace("w", self.load_participant_survey)
 
         # Insert widgets
-        self.start_button = tk.Button(self, text="Start", command=self.start_action)
+        self.start_button = tk.Button(self, text="Start", command=self.start_action, state=tk.DISABLED)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
-        self.survey_view = SurveyView(self)
+        self.survey_canvas = tk.Canvas(self)
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.survey_canvas.yview)
+        self.survey_view = SurveyView(self.survey_canvas)
         self.audio_plot = PlotView(self, "Audio Plot", "Time", "Amplitude")
         self.eda_plot = PlotView(self, "EDA Plot", "Time", "Galvanic Skin Response")
         self.participant_menu = tk.OptionMenu(self, self.option, MainView.PARTICIPANT_STRING)
@@ -39,17 +41,34 @@ class MainView(tk.Frame):
         self.participant_menu.grid(row=0, column=1, sticky="nsew")
         self.start_button.grid(row=0, column=2, sticky="nsew")
         self.stop_button.grid(row=0, column=3, sticky="nsew")
-        self.survey_view.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.survey_canvas.grid(row=1, column=0, sticky="nsew", columnspan=4)
+        self.scrollbar.grid(row=1, column=4, sticky="ns")
         self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
         self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(0, weight=0)
+        self.rowconfigure(1, weight=1, minsize=500)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
         self.columnconfigure(3, weight=1)
+
+        # Setup scroll window
+        self.survey_view.bind(
+            "<Configure>",
+            lambda e: self.survey_canvas.configure(
+                scrollregion=self.survey_canvas.bbox("all")
+            )
+        )
+
+        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="n")
+        self.survey_canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.survey_canvas.bind(
+            "<Configure>",
+            lambda event: self.survey_canvas.itemconfigure(self.canvas_id, width=event.width)
+        )
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
@@ -156,6 +175,11 @@ class MainView(tk.Frame):
             blit=True
         )
 
+    def get_output_file_name(self):
+        participant_name = self.option.get()
+        file_name = "_".join(participant_name.lower().replace(" ", "").split(","))
+        return file_name
+
 
 class SurveyView(tk.Frame):
     """
@@ -165,22 +189,65 @@ class SurveyView(tk.Frame):
     def __init__(self, root, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
-        self.survey_text = tk.Text(self, state=tk.DISABLED)
-        self.survey_text.grid(row=0, column=0, sticky="nsew")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-
-    def update_survey_text(self, text: str) -> None:
+    def update_survey_text(self, survey, subscales_to_segments: dict) -> None:
         """
         Updates the survey text area with the survey results.
 
-        :param text: the survey results in a readable format
+        :param survey: the survey results
+        :param subscales_to_segments: a mapping of subscales to segments
         :return: nothing
         """
-        self.survey_text.config(state=tk.NORMAL)
-        self.survey_text.delete('1.0', tk.END)
-        self.survey_text.insert(tk.END, text)
-        self.survey_text.config(state=tk.DISABLED)
+        row = 0
+        self.columnconfigure(0, weight=1)
+        for subscale, segments in subscales_to_segments.items():
+            questions = [questions for segment, questions in segments.items()]
+            table = TableView(self, subscale, questions, survey, pady=10, padx=10)
+            table.grid(row=row, column=0, sticky='nsew')
+            self.rowconfigure(row, weight=1)
+            row += 1
+
+
+class TableView(tk.Frame):
+
+    def __init__(self, root, title, grid, survey, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+        title_text = tk.Label(self, text=title, pady=20, font="Verdana 16 bold")
+        title_text.grid(row=0, column=0, columnspan=len(grid)*2)
+        self.rowconfigure(0, weight=1)
+        rows = max([len(item) for item in grid])
+        for i in range(len(grid)):
+            column = 2 * i
+            segment = TableView.get_segment(i)
+            segment_label = tk.Label(self, text=segment, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
+            segment_label.grid(row=1, column=column, sticky="nsew")
+            average = TableView.compute_average(grid[i], survey)
+            average_label = tk.Label(self, text=average, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
+            average_label.grid(row=1, column=column+1, sticky="nsew")
+            self.rowconfigure(1, weight=1)
+            for j in range(rows):
+                row = j + 2
+                text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
+                item_label = tk.Label(self, text=text, padx=5, pady=15, borderwidth=1, relief="solid")
+                item_label.grid(row=row, column=column+1, sticky="nsew")
+                desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
+                item_desc = tk.Message(self, text=desc, padx=5, pady=10, anchor="w", borderwidth=1, relief="solid", aspect=500)
+                item_desc.grid(row=row, column=column, sticky="nsew")
+                self.rowconfigure(row, weight=1)
+                self.columnconfigure(column, weight=1, minsize=150)
+                self.columnconfigure(column+1, weight=1, minsize=50)
+
+    @staticmethod
+    def get_segment(index: int):
+        return [
+            "before",
+            "during",
+            "after"
+        ][index]
+
+    @staticmethod
+    def compute_average(column, survey) -> str:
+        scores = [int(survey[f'Q1_{item}_question']) for item in column]
+        return "" if len(scores) == 0 else f'{sum(scores)/len(scores):.2f}'
 
 
 class PlotView(tk.Frame):
