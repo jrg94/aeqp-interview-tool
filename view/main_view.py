@@ -42,7 +42,7 @@ class MainView(tk.Frame):
         self.start_button.grid(row=0, column=2, sticky="nsew")
         self.stop_button.grid(row=0, column=3, sticky="nsew")
         self.survey_canvas.grid(row=1, column=0, sticky="nsew", columnspan=4)
-        self.scrollbar.grid(row=1, column=5, sticky="ns")
+        self.scrollbar.grid(row=1, column=4, sticky="ns")
         self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
         self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
@@ -62,8 +62,13 @@ class MainView(tk.Frame):
             )
         )
 
-        self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="nw")
+        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="nw")
         self.survey_canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.survey_canvas.bind(
+            "<Configure>",
+            lambda event: self.survey_canvas.itemconfigure(self.canvas_id, width=event.width)
+        )
 
         # Pack window
         self.grid(row=0, column=0, sticky="nsew")
