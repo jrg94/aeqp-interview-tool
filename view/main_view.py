@@ -174,28 +174,30 @@ class SurveyView(tk.Frame):
         :return: nothing
         """
         row = 0
+        self.columnconfigure(0, weight=1)
         for subscale, segments in subscales_to_segments.items():
             questions = [questions for segment, questions in segments.items()]
             table = TableView(self, subscale, questions)
             table.grid(row=row, column=0, sticky='nsew')
+            self.rowconfigure(row, weight=1)
+            row += 1
 
 
 class TableView(tk.Frame):
 
     def __init__(self, root, title, grid, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
-        title_text = tk.Text(self)
-        title_text.insert(tk.END, title)
-        title_text.config(state=tk.DISABLED)
+        title_text = tk.Label(self, text=title)
         title_text.grid(row=0, column=0, columnspan=len(grid))
-        for i, column in enumerate(grid):
-            for j, row in enumerate(column):
-                item = tk.Text(self)
+        self.rowconfigure(0, weight=1)
+        rows = max([len(item) for item in grid])
+        for i in range(len(grid)):
+            for j in range(rows):
+                text = "" if len(grid[i]) <= j else grid[i][j]
+                item = tk.Label(self, text=text)
                 item.grid(row=j+1, column=i, sticky="nsew")
-                item.insert(tk.END, row)
-                item.config(state=tk.DISABLED)
-                self.rowconfigure(i, weight=1)
-                self.columnconfigure(j, weight=1)
+                self.rowconfigure(j+1, weight=1)
+                self.columnconfigure(i, weight=1)
 
 
 class PlotView(tk.Frame):
