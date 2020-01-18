@@ -47,7 +47,7 @@ class MainView(tk.Frame):
         self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
         self.rowconfigure(0, weight=0)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(1, weight=1, minsize=500)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
@@ -62,7 +62,7 @@ class MainView(tk.Frame):
             )
         )
 
-        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="nw")
+        self.canvas_id = self.survey_canvas.create_window((0, 0), window=self.survey_view, anchor="center")
         self.survey_canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.survey_canvas.bind(
@@ -197,7 +197,7 @@ class SurveyView(tk.Frame):
         for subscale, segments in subscales_to_segments.items():
             questions = [questions for segment, questions in segments.items()]
             table = TableView(self, subscale, questions, survey, pady=10, padx=10)
-            table.grid(row=row, column=0, sticky='nsew')
+            table.grid(row=row, column=0, sticky='ns')
             self.rowconfigure(row, weight=1)
             row += 1
 
@@ -222,11 +222,11 @@ class TableView(tk.Frame):
                 item_label = tk.Label(self, text=text, padx=5, pady=15, borderwidth=1, relief="solid")
                 item_label.grid(row=row, column=column+1, sticky="nsew")
                 desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
-                item_desc = tk.Label(self, text=desc, padx=5, pady=15, anchor="w", borderwidth=1, relief="solid")
+                item_desc = tk.Message(self, text=desc, padx=5, pady=10, anchor="w", borderwidth=1, relief="solid", aspect=500)
                 item_desc.grid(row=row, column=column, sticky="nsew")
                 self.rowconfigure(row, weight=1)
-                self.columnconfigure(column, weight=1)
-                self.columnconfigure(column+1, weight=1)
+                self.columnconfigure(column, weight=1, minsize=150)
+                self.columnconfigure(column+1, weight=1, minsize=50)
 
     @staticmethod
     def get_segment(index: int):
