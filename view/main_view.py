@@ -165,11 +165,6 @@ class SurveyView(tk.Frame):
     def __init__(self, root, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
-        #self.survey_text = tk.Text(self, state=tk.DISABLED)
-        #self.survey_text.grid(row=0, column=0, sticky="nsew")
-        #self.rowconfigure(0, weight=1)
-        #self.columnconfigure(0, weight=1)
-
     def update_survey_text(self, survey, subscales_to_segments: dict) -> None:
         """
         Updates the survey text area with the survey results.
@@ -178,12 +173,29 @@ class SurveyView(tk.Frame):
         :param subscales_to_segments: a mapping of subscales to segments
         :return: nothing
         """
+        row = 0
+        for subscale, segments in subscales_to_segments.items():
+            questions = [questions for segment, questions in segments.items()]
+            table = TableView(self, subscale, questions)
+            table.grid(row=row, column=0, sticky='nsew')
 
-        print(subscales_to_segments)
-        #self.survey_text.config(state=tk.NORMAL)
-        #self.survey_text.delete('1.0', tk.END)
-        #self.survey_text.insert(tk.END, text)
-        #self.survey_text.config(state=tk.DISABLED)
+
+class TableView(tk.Frame):
+
+    def __init__(self, root, title, grid, *args, **kwargs):
+        tk.Frame.__init__(self, root, *args, **kwargs)
+        title_text = tk.Text(self)
+        title_text.insert(tk.END, title)
+        title_text.config(state=tk.DISABLED)
+        title_text.grid(row=0, column=0, columnspan=len(grid))
+        for i, column in enumerate(grid):
+            for j, row in enumerate(column):
+                item = tk.Text(self)
+                item.grid(row=j+1, column=i, sticky="nsew")
+                item.insert(tk.END, row)
+                item.config(state=tk.DISABLED)
+                self.rowconfigure(i, weight=1)
+                self.columnconfigure(j, weight=1)
 
 
 class PlotView(tk.Frame):

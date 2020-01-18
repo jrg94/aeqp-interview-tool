@@ -58,7 +58,7 @@ class SyncController:
                 "during": [x for x in subscale_questions if "during" in x],
                 "after": [x for x in subscale_questions if "after" in x]
             }
-        self.view.survey_view.update_survey_text(survey_results, subscales_to_segments)
+        self.view.survey_view.update_survey_text(participant_results, subscales_to_segments)
 
     @staticmethod
     def _participant_name(item: dict):
