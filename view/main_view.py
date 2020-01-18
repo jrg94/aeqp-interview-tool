@@ -165,22 +165,25 @@ class SurveyView(tk.Frame):
     def __init__(self, root, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
-        self.survey_text = tk.Text(self, state=tk.DISABLED)
-        self.survey_text.grid(row=0, column=0, sticky="nsew")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
+        #self.survey_text = tk.Text(self, state=tk.DISABLED)
+        #self.survey_text.grid(row=0, column=0, sticky="nsew")
+        #self.rowconfigure(0, weight=1)
+        #self.columnconfigure(0, weight=1)
 
-    def update_survey_text(self, text: str) -> None:
+    def update_survey_text(self, survey, subscales_to_segments: dict) -> None:
         """
         Updates the survey text area with the survey results.
 
-        :param text: the survey results in a readable format
+        :param survey: the survey results
+        :param subscales_to_segments: a mapping of subscales to segments
         :return: nothing
         """
-        self.survey_text.config(state=tk.NORMAL)
-        self.survey_text.delete('1.0', tk.END)
-        self.survey_text.insert(tk.END, text)
-        self.survey_text.config(state=tk.DISABLED)
+
+        print(subscales_to_segments)
+        #self.survey_text.config(state=tk.NORMAL)
+        #self.survey_text.delete('1.0', tk.END)
+        #self.survey_text.insert(tk.END, text)
+        #self.survey_text.config(state=tk.DISABLED)
 
 
 class PlotView(tk.Frame):

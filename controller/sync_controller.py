@@ -49,8 +49,16 @@ class SyncController:
             if item.get(SyncController.LAST_NAME_HEADER) == last_and_first[0]
             and item.get(SyncController.FIRST_NAME_HEADER) == last_and_first[1]
         )
-        survey_text = "\n".join([f'{k}: {v}' for k, v in participant_results.items()])
-        self.view.survey_view.update_survey_text(survey_text)
+        subscales_to_segments = {}
+        subscales = {participant_results[key] for key in participant_results if "subscale" in key}
+        for subscale in subscales:
+            subscale_questions = ["_".join(key.split("_")[1:3]) for key, value in participant_results.items() if subscale == value]
+            subscales_to_segments[subscale] = {
+                "before": [x for x in subscale_questions if "before" in x],
+                "during": [x for x in subscale_questions if "during" in x],
+                "after": [x for x in subscale_questions if "after" in x]
+            }
+        self.view.survey_view.update_survey_text(survey_results, subscales_to_segments)
 
     @staticmethod
     def _participant_name(item: dict):
