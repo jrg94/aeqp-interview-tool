@@ -187,23 +187,23 @@ class TableView(tk.Frame):
 
     def __init__(self, root, title, grid, survey, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
-        title_text = tk.Label(self, text=title, pady=10)
+        title_text = tk.Label(self, text=title, pady=20, font="Verdana 16 bold")
         title_text.grid(row=0, column=0, columnspan=len(grid)*2)
         self.rowconfigure(0, weight=1)
         rows = max([len(item) for item in grid])
         for i in range(len(grid)):
             segment = TableView.get_segment(i)
-            segment_label = tk.Label(self, text=segment, pady=10)
+            segment_label = tk.Label(self, text=segment, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
             segment_label.grid(row=1, column=i*2, columnspan=2, sticky="nsew")
             self.rowconfigure(1, weight=1)
             for j in range(rows):
                 row = j + 2
                 column = 2 * i
                 text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
-                item_label = tk.Label(self, text=text, pady=10)
+                item_label = tk.Label(self, text=text, padx=5, pady=15, borderwidth=1, relief="solid")
                 item_label.grid(row=row, column=column+1, sticky="nsew")
                 desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
-                item_desc = tk.Label(self, text=desc, pady=10, anchor="w")
+                item_desc = tk.Label(self, text=desc, padx=5, pady=15, anchor="w", borderwidth=1, relief="solid")
                 item_desc.grid(row=row, column=column, sticky="nsew")
                 self.rowconfigure(row, weight=1)
                 self.columnconfigure(column, weight=1)
