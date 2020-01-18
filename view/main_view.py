@@ -197,7 +197,7 @@ class SurveyView(tk.Frame):
         for subscale, segments in subscales_to_segments.items():
             questions = [questions for segment, questions in segments.items()]
             table = TableView(self, subscale, questions, survey, pady=10, padx=10)
-            table.grid(row=row, column=0, sticky='ns')
+            table.grid(row=row, column=0, sticky='nsew')
             self.rowconfigure(row, weight=1)
             row += 1
 
@@ -211,13 +211,16 @@ class TableView(tk.Frame):
         self.rowconfigure(0, weight=1)
         rows = max([len(item) for item in grid])
         for i in range(len(grid)):
+            column = 2 * i
             segment = TableView.get_segment(i)
             segment_label = tk.Label(self, text=segment, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
-            segment_label.grid(row=1, column=i*2, columnspan=2, sticky="nsew")
+            segment_label.grid(row=1, column=column, sticky="nsew")
+            average = TableView.compute_average(grid[i], survey)
+            average_label = tk.Label(self, text=average, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
+            average_label.grid(row=1, column=column+1, sticky="nsew")
             self.rowconfigure(1, weight=1)
             for j in range(rows):
                 row = j + 2
-                column = 2 * i
                 text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
                 item_label = tk.Label(self, text=text, padx=5, pady=15, borderwidth=1, relief="solid")
                 item_label.grid(row=row, column=column+1, sticky="nsew")
@@ -235,6 +238,11 @@ class TableView(tk.Frame):
             "during",
             "after"
         ][index]
+
+    @staticmethod
+    def compute_average(column, survey) -> str:
+        scores = [int(survey[f'Q1_{item}_question']) for item in column]
+        return "" if len(scores) == 0 else f'{sum(scores)/len(scores):.2f}'
 
 
 class PlotView(tk.Frame):
