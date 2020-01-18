@@ -46,7 +46,7 @@ class MainView(tk.Frame):
         self.audio_plot.grid(row=2, column=0, sticky="nsew", columnspan=2)
         self.eda_plot.grid(row=2, column=2, sticky="nsew", columnspan=2)
 
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
