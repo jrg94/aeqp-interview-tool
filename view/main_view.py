@@ -25,7 +25,7 @@ class MainView(tk.Frame):
         self.option.trace("w", self.load_participant_survey)
 
         # Insert widgets
-        self.start_button = tk.Button(self, text="Start", command=self.start_action)
+        self.start_button = tk.Button(self, text="Start", command=self.start_action, state=tk.DISABLED)
         self.stop_button = tk.Button(self, text="Stop", command=self.stop_action, state=tk.DISABLED)
         self.file_select_button = tk.Button(self, text="Select Survey File", command=self.load_survey_event)
         self.survey_canvas = tk.Canvas(self)
