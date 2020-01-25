@@ -261,7 +261,11 @@ class PlotView(tk.Frame):
     def __init__(self, root, title, x_label, y_label, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
-        self.plots = Figure(figsize=(5, 4), dpi=100)
+        self.title = title
+        self.x_label = x_label
+        self.y_label = y_label
+
+        self.plots = Figure(figsize=(6, 4), dpi=100)
         self.plot = self.plots.add_subplot(111)
         self.curve, = self.plot.plot([])
         self.canvas = FigureCanvasTkAgg(self.plots, master=self)
@@ -279,4 +283,7 @@ class PlotView(tk.Frame):
         self.plot.clear()
 
     def redraw(self):
+        self.plots.suptitle(self.title)
+        self.plot.set_xlabel(self.x_label)
+        self.plot.set_ylabel(self.y_label)
         self.canvas.draw()
