@@ -19,7 +19,8 @@ class MainView(tk.Frame):
 
         # Initialize fields
         self.controller = None
-        self.ani = None
+        self.ani_audio = None
+        self.ani_eda = None
         self.option = tk.StringVar(self)
         self.option.set(MainView.PARTICIPANT_STRING)
         self.option.trace("w", self.load_participant_survey)
@@ -70,7 +71,6 @@ class MainView(tk.Frame):
             lambda event: self.survey_canvas.itemconfigure(self.canvas_id, width=event.width)
         )
 
-        # Pack window
         self.grid(row=0, column=0, sticky="nsew")
 
     def load_survey_event(self) -> None:
@@ -168,10 +168,16 @@ class MainView(tk.Frame):
 
         :return: nothing
         """
-        self.ani = animation.FuncAnimation(
+        self.ani_audio = animation.FuncAnimation(
             self.audio_plot.plots,
             self.controller.process_audio_animation,
-            interval=100,
+            interval=500,
+            blit=True
+        )
+        self.ani_eda: animation.FuncAnimation = animation.FuncAnimation(
+            self.eda_plot.plots,
+            self.controller.process_eda_animation,
+            interval=500,
             blit=True
         )
 
@@ -268,3 +274,9 @@ class PlotView(tk.Frame):
 
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
+
+    def clear(self):
+        self.plot.clear()
+
+    def redraw(self):
+        self.canvas.draw()

@@ -89,11 +89,14 @@ class EDAManager:
         raw_data_list = raw_data.decode("utf-8").splitlines()
         for sample in raw_data_list:
             items = sample.split(" ")
-            self.data.append({
-                "type": items[0],
-                "time": items[1],
-                "value": items[2:]
-            })
+            try:
+                self.data.append({
+                    "type": items[0],
+                    "time": items[1],
+                    "value": items[2]  # hardcoded for gsr
+                })
+            except IndexError:
+                print(f"Sample lost: {sample}")
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
