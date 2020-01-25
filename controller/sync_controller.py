@@ -6,6 +6,7 @@ from model.audio_manager import AudioManager
 from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
+import pandas as pd
 
 
 class SyncController:
@@ -103,6 +104,7 @@ class SyncController:
         audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
         eda_file_path = SyncController.get_fresh_output_path(file_name, "eda")
         self.audio_model.dump_recording(audio_file_path)
+        self.eda_model.dump_recording(eda_file_path)
 
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
@@ -114,11 +116,24 @@ class SyncController:
         :param i: the index of the current frame
         :return: an iterable of items to be cleared
         """
-        self.view.audio_plot.plot.clear()
+        self.view.audio_plot.clear()
         decoded = numpy.fromstring(b''.join(self.audio_model.data), numpy.int16)
-        self.view.curve, = self.view.audio_plot.plot.plot(decoded)
-        self.view.audio_plot.canvas.draw()
-        return self.view.curve,
+        self.view.audio_plot.curve, = self.view.audio_plot.plot.plot(decoded)
+        self.view.audio_plot.redraw()
+        return self.view.audio_plot.curve,
+
+    def process_eda_animation(self, i):
+        self.view.eda_plot.clear()
+        try:
+            df = pd.DataFrame(self.eda_model.data)
+            time = df.get("time", pd.DataFrame()).astype("float")
+            value = df.get("value", pd.DataFrame()).astype("float")
+            if not time.empty and not value.empty:
+                self.view.eda_plot.curve, = self.view.eda_plot.plot.plot(time, value)
+            self.view.eda_plot.redraw()
+        except Exception as e:
+            print(f"Failed to draw a frame: {e}")
+        return self.view.eda_plot.curve,
 
     @staticmethod
     def get_fresh_output_path(filename, data_type):

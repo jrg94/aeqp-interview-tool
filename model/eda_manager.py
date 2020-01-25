@@ -1,3 +1,4 @@
+import csv
 import socket
 import threading
 
@@ -63,7 +64,6 @@ class EDAManager:
         """
         self.socket.close()
         self.stream_thread.join()
-        self._clear_logs()
 
     def _stream_data(self) -> None:
         """
@@ -89,12 +89,14 @@ class EDAManager:
         raw_data_list = raw_data.decode("utf-8").splitlines()
         for sample in raw_data_list:
             items = sample.split(" ")
-            self.data.append({
-                "type": items[0],
-                "time": items[1],
-                "value": items[2:]
-            })
-            print(self.data[-1])
+            try:
+                self.data.append({
+                    "type": items[0],
+                    "time": items[1],
+                    "value": items[2]  # hardcoded for gsr
+                })
+            except IndexError:
+                print(f"Sample lost: {sample}")
 
     @staticmethod
     def _construct_command(command, *args) -> bytes:
@@ -180,3 +182,13 @@ class EDAManager:
         """
         self.data = list()
         self.response_log = list()
+
+    def dump_recording(self, path) -> None:
+        """
+        Dumps a recording to the root of the project.
+        """
+        with open(path, "w", newline="") as dump:
+            writer = csv.DictWriter(dump, self.data[0].keys())
+            writer.writeheader()
+            writer.writerows(self.data)
+        self._clear_logs()
