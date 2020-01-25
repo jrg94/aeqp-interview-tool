@@ -103,6 +103,7 @@ class SyncController:
         audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
         eda_file_path = SyncController.get_fresh_output_path(file_name, "eda")
         self.audio_model.dump_recording(audio_file_path)
+        self.eda_model.dump_recording(eda_file_path)
 
         self.view.update_start_enabled(True)
         self.view.update_stop_enabled(False)
