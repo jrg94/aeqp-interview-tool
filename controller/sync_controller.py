@@ -101,8 +101,8 @@ class SyncController:
         self.eda_model.stop_recording()
 
         file_name = self.view.get_output_file_name()
-        audio_file_path = SyncController.get_fresh_output_path(file_name, "audio")
-        eda_file_path = SyncController.get_fresh_output_path(file_name, "eda")
+        audio_file_path = SyncController.get_fresh_output_path(file_name, "audio", "wav")
+        eda_file_path = SyncController.get_fresh_output_path(file_name, "eda", "csv")
         self.audio_model.dump_recording(audio_file_path)
         self.eda_model.dump_recording(eda_file_path)
 
@@ -136,12 +136,12 @@ class SyncController:
         return self.view.eda_plot.curve,
 
     @staticmethod
-    def get_fresh_output_path(filename, data_type):
+    def get_fresh_output_path(filename, data_type, ext):
         i = 1
-        file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+        file_path = os.path.join("data", f'{filename}_{data_type}_{i}.{ext}')
         if os.path.isdir("data"):
             while os.path.isfile(file_path):
-                file_path = os.path.join("data", f'{filename}_{data_type}_{i}')
+                file_path = os.path.join("data", f'{filename}_{data_type}_{i}.{ext}')
                 i += 1
         else:
             os.mkdir("data")

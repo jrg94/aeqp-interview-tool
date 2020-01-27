@@ -188,7 +188,8 @@ class EDAManager:
         Dumps a recording to the root of the project.
         """
         with open(path, "w", newline="") as dump:
-            writer = csv.DictWriter(dump, self.data[0].keys())
-            writer.writeheader()
-            writer.writerows(self.data)
+            if self.data:
+                writer = csv.DictWriter(dump, self.data[0].keys())
+                writer.writeheader()
+                writer.writerows(self.data)
         self._clear_logs()
