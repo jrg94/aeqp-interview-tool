@@ -52,7 +52,7 @@ class EDAManager:
         device_id = devices[0].split(" ")[0]
         is_connected = self._connect_device(device_id)
         if is_connected:
-            self._subscribe_stream(EDAManager.BLOOD_VOLUME_PULSE)
+            self._subscribe_stream(EDAManager.GALVANIC_SKIN_RESPONSE)
             self.stream_thread = threading.Thread(target=self._stream_data)
             self.stream_thread.start()
 
