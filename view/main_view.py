@@ -1,9 +1,10 @@
+import statistics
 import tkinter as tk
 from tkinter import filedialog
 
+import matplotlib.animation as animation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import matplotlib.animation as animation
 
 
 class MainView(tk.Frame):
@@ -226,7 +227,7 @@ class TableView(tk.Frame):
             segment = TableView.get_segment(i)
             segment_label = tk.Label(self, text=segment, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
             segment_label.grid(row=1, column=column, sticky="nsew")
-            average = TableView.compute_average(grid[i], survey)
+            average = TableView.compute_average_and_median(grid[i], survey)
             average_label = tk.Label(self, text=average, pady=15, borderwidth=2, relief="solid", font="Verdana 10 bold")
             average_label.grid(row=1, column=column+1, sticky="nsew")
             self.rowconfigure(1, weight=1)
@@ -251,9 +252,9 @@ class TableView(tk.Frame):
         ][index]
 
     @staticmethod
-    def compute_average(column, survey) -> str:
+    def compute_average_and_median(column, survey) -> str:
         scores = [int(survey[f'Q1_{item}_question']) for item in column]
-        return "" if len(scores) == 0 else f'{sum(scores)/len(scores):.2f}'
+        return "" if len(scores) == 0 else f'Mean: {statistics.mean(scores):.2f}\nMedian: {statistics.median(scores):.2f}'
 
 
 class PlotView(tk.Frame):
