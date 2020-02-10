@@ -1,5 +1,6 @@
 import statistics
 import tkinter as tk
+from collections import OrderedDict
 from tkinter import filedialog
 
 import matplotlib.animation as animation
@@ -196,7 +197,7 @@ class SurveyView(tk.Frame):
     def __init__(self, root, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
 
-    def update_survey_text(self, survey, subscales_to_segments: dict) -> None:
+    def update_survey_text(self, survey: OrderedDict, subscales_to_segments: dict) -> None:
         """
         Updates the survey text area with the survey results.
 
@@ -206,8 +207,10 @@ class SurveyView(tk.Frame):
         """
         row = 0
         self.columnconfigure(0, weight=1)
-        for subscale, segments in subscales_to_segments.items():
-            questions = [questions for segment, questions in segments.items()]
+        subscales = list(subscales_to_segments.keys())
+        subscales.sort()
+        for subscale in subscales:
+            questions = [questions for segment, questions in subscales_to_segments[subscale].items()]
             table = TableView(self, subscale, questions, survey, pady=10, padx=10)
             table.grid(row=row, column=0, sticky='nsew')
             self.rowconfigure(row, weight=1)
@@ -216,7 +219,7 @@ class SurveyView(tk.Frame):
 
 class TableView(tk.Frame):
 
-    def __init__(self, root, title, grid, survey, *args, **kwargs):
+    def __init__(self, root, title: str, grid: list, survey: OrderedDict, *args, **kwargs):
         tk.Frame.__init__(self, root, *args, **kwargs)
         title_text = tk.Label(self, text=title, pady=20, font="Verdana 16 bold")
         title_text.grid(row=0, column=0, columnspan=len(grid)*2)
@@ -233,18 +236,80 @@ class TableView(tk.Frame):
             self.rowconfigure(1, weight=1)
             for j in range(rows):
                 row = j + 2
-                text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
-                item_label = tk.Label(self, text=text, padx=5, pady=15, borderwidth=1, relief="solid")
-                item_label.grid(row=row, column=column+1, sticky="nsew")
-                desc = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
-                item_desc = tk.Message(self, text=desc, padx=5, pady=10, anchor="w", borderwidth=1, relief="solid", aspect=500)
-                item_desc.grid(row=row, column=column, sticky="nsew")
-                self.rowconfigure(row, weight=1)
-                self.columnconfigure(column, weight=1, minsize=150)
-                self.columnconfigure(column+1, weight=1, minsize=50)
+                self._generate_table_cell(grid, survey, row, column, i, j)
+
+    def _generate_table_cell(self, grid: list, survey: OrderedDict, row: int, column: int, i: int, j: int):
+        """
+        Generates a table cell consisting of a subscale score and a subscale description.
+
+        :param grid: a list of question lists organized by subscale (i.e. [['13_before', '14_before'], ...])
+        :param survey: the survey results for a participant
+        :param row: the physical row that content will appear in the table
+        :param column: the physical column that content will appear in the table
+        :param i: the row index of the grid
+        :param j: the column index of the grid
+        :return: nothing
+        """
+        subscale_score_label = self._create_subscale_score_label(grid, survey, i, j)
+        subscale_desc_label = self._create_subscale_desc_label(grid, survey, i, j)
+        subscale_score_label.grid(row=row, column=column + 1, sticky="nsew")
+        subscale_desc_label.grid(row=row, column=column, sticky="nsew")
+        self.rowconfigure(row, weight=1)
+        self.columnconfigure(column, weight=1, minsize=150)
+        self.columnconfigure(column + 1, weight=1, minsize=50)
+
+    def _create_subscale_score_label(self, grid: list, survey: OrderedDict, i: int, j: int) -> tk.Label:
+        """
+        Creates a subscale score label from the grid of questions and the participant survey.
+
+        :param grid: a list of question lists organized by subscale (i.e. [['13_before', '14_before'], ...])
+        :param survey: the survey results for a participant
+        :param i: the row index of the grid
+        :param j: the column index of the grid
+        :return: a subscale score label
+        """
+        subscale_score_text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_question']
+        subscale_score_label = tk.Label(
+            self,
+            text=subscale_score_text,
+            padx=5,
+            pady=15,
+            borderwidth=1,
+            relief="solid"
+        )
+        return subscale_score_label
+
+    def _create_subscale_desc_label(self, grid: list, survey: OrderedDict, i: int, j: int) -> tk.Message:
+        """
+        Creates a subscale description label from the participant survey and the grid of questions.
+
+        :param grid: a list of question lists organized by subscale (i.e. [['13_before', '14_before'], ...])
+        :param survey: the survey results for a participant
+        :param i: the row index of the grid
+        :param j: the column index of the grid
+        :return: a subscale description label
+        """
+        subscale_desc_text = "" if len(grid[i]) <= j else survey[f'Q1_{grid[i][j]}_description']
+        subscale_desc_label = tk.Message(
+            self,
+            text=subscale_desc_text,
+            padx=5,
+            pady=10,
+            anchor="w",
+            borderwidth=1,
+            relief="solid",
+            aspect=500
+        )
+        return subscale_desc_label
 
     @staticmethod
-    def get_segment(index: int):
+    def get_segment(index: int) -> str:
+        """
+        Given an index, this method returns a survey segment (i.e. before, during, or after).
+
+        :param index: the index of the segment
+        :return: a segment
+        """
         return [
             "before",
             "during",
@@ -253,8 +318,15 @@ class TableView(tk.Frame):
 
     @staticmethod
     def compute_average_and_median(column, survey) -> str:
+        """
+        Computes the average and median from a column of question IDs and the participant survey.
+
+        :param column: a column of question IDs of the form [id1, id2, ..., idn] (i.e. ['13_before', '14_before'])
+        :param survey: the participant survey results
+        :return: a mean and median as a string (empty string if empty column)
+        """
         scores = [int(survey[f'Q1_{item}_question']) for item in column]
-        return "" if len(scores) == 0 else f'Mean: {statistics.mean(scores):.2f}\nMedian: {statistics.median(scores):.2f}'
+        return "" if not scores else f'Mean: {statistics.mean(scores):.2f}\nMedian: {statistics.median(scores):.2f}'
 
 
 class PlotView(tk.Frame):
