@@ -1,12 +1,12 @@
 import os
 
 import numpy
+import pandas as pd
 
 from model.audio_manager import AudioManager
 from model.eda_manager import EDAManager
 from model.survey_manager import SurveyManager
 from view.main_view import MainView
-import pandas as pd
 
 
 class SyncController:

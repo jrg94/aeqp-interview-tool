@@ -3,6 +3,7 @@ import os
 import tkinter as tk
 from contextlib import ExitStack
 from tkinter import filedialog
+import pathlib
 
 SEGMENTS = ("before", "during", "after")
 FIRST_NAME = "RecipientFirstName"
@@ -97,8 +98,15 @@ def load_questions(responses: dict, participant: dict, segment: str, metadata: d
             responses[sub_scale] = EMOTIONS_TO_PROMPTS[segment][i]
 
 
-def dump_csv(master_survey: list):
-    with open("../data/aggregate_survey.csv", "w", newline="") as dump:
+def dump_csv(master_survey: list, file_path: pathlib.Path):
+    """
+    Dumps survey to some file path as a CSV.
+
+    :param master_survey: the aggregate survey
+    :param file_path: the path to dump the aggregate survey
+    :return: nothing
+    """
+    with file_path.joinpath("aggregate_survey.csv").open(mode="w", newline="") as dump:
         writer = csv.DictWriter(dump, master_survey[0].keys())
         writer.writeheader()
         writer.writerows(master_survey)
@@ -114,7 +122,8 @@ def main():
         master_survey = []
         for i in range(len(surveys[SEGMENTS[0]]["survey"])):
             master_survey.append(get_student_responses(surveys, i))
-        dump_csv(master_survey)
+        dump_csv(master_survey, pathlib.Path(file_paths[0]).parent.absolute())
 
 
-main()
+if __name__ == '__main__':
+    main()
