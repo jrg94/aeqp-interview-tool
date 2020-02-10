@@ -15,9 +15,9 @@ EMOTIONS_TO_PROMPTS = {
     "during": ["enjoyment", "enjoyment", "enjoyment", "hope", "hope", "pride", "pride", "anger", "anger", "anxiety",
                "anxiety", "anxiety", "anxiety", "anxiety", "anxiety", "anxiety", "shame", "shame", "shame", "shame",
                "shame", "hopelessness", "hopelessness", "hopelessness", "hopelessness", "hopelessness", "hopelessness"],
-    "after": ["enjoyment", "enjoyment", "pride", "pride", "pride", "pride", "pride", "pride", "pride", "anger", "anger",
-              "anger", "anger", "anger", "anger", "shame", "shame", "shame", "shame", "relief", "relief", "relief",
-              "relief", "relief", "relief"]
+    "after": ["enjoyment", "enjoyment", "pride", "pride", "pride", "pride", "pride", "pride", "pride", "relief",
+              "relief", "relief", "relief", "relief", "relief", "anger", "anger", "anger", "anger", "anger", "anger",
+              "shame", "shame", "shame", "shame"]
 }
 
 
@@ -87,7 +87,7 @@ def load_questions(responses: dict, participant: dict, segment: str, metadata: d
     :return: nothing
     """
     for i in range(len(EMOTIONS_TO_PROMPTS[segment])):
-        question_base = f'Q1_{i}'
+        question_base = f'Q1_{i + 1}'
         if question_base in participant:
             question = f'{question_base}_{segment}_question'
             responses[question] = participant[question_base]
