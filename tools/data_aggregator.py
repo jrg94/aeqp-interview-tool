@@ -1,8 +1,8 @@
 import csv
+import os
 import tkinter as tk
 from contextlib import ExitStack
 from tkinter import filedialog
-import os
 
 SEGMENTS = ("before", "during", "after")
 FIRST_NAME = "RecipientFirstName"
